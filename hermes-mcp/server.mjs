@@ -176,5 +176,23 @@ server.tool(
   }
 );
 
+/* ---------------- HEART · CONNECTION ---------------- */
+
+server.tool(
+  "log_heart",
+  "Log a moment of connection / relationship tending (Heart module). Gentle, not scored.",
+  {
+    kind: z.enum(["mama", "partner", "family", "self", "other"])
+      .describe("mama = Mama practice · partner = check-in with R · family · self = self-compassion · other"),
+    detail: z.string().optional(),
+    log_date: z.string().optional().describe("YYYY-MM-DD, defaults to today"),
+  },
+  async (args) => {
+    const { data, error } = await sb.from("heart_logs")
+      .insert({ ...args, created_by: "hermes" }).select().single();
+    return error ? fail(error) : ok(data);
+  }
+);
+
 const transport = new StdioServerTransport();
 await server.connect(transport);

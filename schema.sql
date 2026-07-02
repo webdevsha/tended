@@ -95,6 +95,18 @@ create table if not exists plc_log (
   created_at timestamptz default now()
 );
 
+-- ---------- HEART (Qalb) · relationships & connection ----------
+
+create table if not exists heart_logs (
+  id uuid primary key default gen_random_uuid(),
+  log_date date not null default current_date,
+  kind text not null                       -- mama | partner | family | self | other
+    check (kind in ('mama','partner','family','self','other')),
+  detail text,
+  created_by text not null default 'sha',  -- 'sha' | 'hermes'
+  created_at timestamptz default now()
+);
+
 -- ---------- SECURITY (single-user, anon key) ----------
 -- MVP: RLS enabled with permissive policies for the anon role.
 -- Your anon key is the password to this data — do not publish the
@@ -108,11 +120,12 @@ alter table time_blocks     enable row level security;
 alter table journal_entries enable row level security;
 alter table weekly_reviews  enable row level security;
 alter table plc_log         enable row level security;
+alter table heart_logs      enable row level security;
 
 do $$
 declare t text;
 begin
-  foreach t in array array['categories','transactions','invoices','time_blocks','journal_entries','weekly_reviews','plc_log']
+  foreach t in array array['categories','transactions','invoices','time_blocks','journal_entries','weekly_reviews','plc_log','heart_logs']
   loop
     execute format('drop policy if exists "anon full access" on %I', t);
     execute format('create policy "anon full access" on %I for all using (true) with check (true)', t);

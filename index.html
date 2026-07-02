@@ -163,6 +163,20 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
 .view-toggle button:hover{color:var(--text-dark);background:rgba(255,255,255,.6)}
 .view-toggle button.active{background:#fff;color:var(--text-dark);box-shadow:0 2px 4px rgba(0,0,0,.08);font-weight:700}
 
+/* Coming soon (disabled) */
+.coming-soon{opacity:.45;cursor:not-allowed!important;pointer-events:none}
+.soon-badge{font-size:.6rem;text-transform:uppercase;letter-spacing:.05em;background:#eee;color:#999;padding:.1rem .35rem;border-radius:4px;margin-left:.35rem;vertical-align:middle;font-weight:600}
+.element-item.coming-soon:hover{background:none}
+.coming-soon-panel{text-align:center;padding:2.5rem 1rem;color:var(--text-light)}
+.coming-soon-panel .cs-icon{font-size:2rem;margin-bottom:.75rem}
+.coming-soon-panel h2{font-family:'Lora',serif;color:var(--text-gray);font-size:1.2rem;margin-bottom:.4rem}
+.streak-chip{display:inline-flex;align-items:center;gap:.3rem;font-size:.75rem;font-weight:600;color:#9d174d;background:#ffe4e6;padding:.2rem .55rem;border-radius:50px}
+.practice-row{display:flex;align-items:center;gap:.7rem;padding:.55rem .2rem;border-bottom:1px solid #f0f0f0;font-size:.9rem}
+.practice-row:last-child{border-bottom:none}
+.practice-dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#fff}
+.practice-dot.done{background:#fb7185}
+.practice-dot.todo{background:#e5e7eb;color:#9ca3af}
+.tag-heart{background:#ffe4e6;color:#9f1239}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .fade-in{animation:fadeInUp .5s ease-out}
@@ -207,7 +221,7 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
 
     <div class="ob-footer">
       <button class="demo-link" onclick="startDemo()">Explore in demo mode first →</button>
-      <button class="btn btn-yellow" id="enterBtn" onclick="enterApp()" disabled>Enter your Company of One</button>
+      <button class="btn btn-yellow" id="enterBtn" onclick="showLogin()" disabled>Continue to sign in</button>
     </div>
   </div>
 </div>
@@ -233,12 +247,43 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
       <button class="btn btn-soft" onclick="copyMcpConfig()">Copy Hermes MCP config</button>
     </div>
     <div class="ob-step">
-      <div class="ob-step-head"><strong>Google Calendar import</strong></div>
-      <p>Coming in Module 2 v2 — time blocks will auto-import from your color-coded GCal. For now, log blocks here or let Hermes log them via MCP.</p>
+      <div class="ob-step-head"><strong>Google Calendar → time blocks</strong></div>
+      <p>Auto-sync is Module 2 v2. For now: in Google Calendar, export a day or week as an <code class="inline">.ics</code> file and import it here — each event becomes a time block you can keep or delete. Hermes can also log blocks via MCP.</p>
+      <div class="form-row">
+        <select id="icsDomain" title="Domain for imported events">
+          <option>Admin</option><option>Irori</option><option>AIS</option><option>Family</option><option>Spiritual</option><option>Website</option><option>Other</option>
+        </select>
+        <input id="icsFile" type="file" accept=".ics,text/calendar">
+        <button class="btn btn-primary" onclick="importIcs()">Import .ics</button>
+      </div>
+      <label style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--text-gray);margin-top:.4rem"><input type="checkbox" id="icsWork" checked style="min-width:auto;flex:none"> imported events count as work</label>
+      <div class="ob-status" id="icsStatus"></div>
     </div>
     <div class="ob-footer">
       <button class="demo-link" onclick="disconnect()">Disconnect / reset this device</button>
+      <button class="demo-link" id="signOutBtn" onclick="signOutUser()" style="display:none">Sign out</button>
       <button class="btn btn-primary" onclick="closeSettings()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ LOGIN (magic link) ═══════════ -->
+<div class="overlay hidden" id="loginOverlay">
+  <div class="onboard">
+    <h2>One more door.</h2>
+    <p class="sub">A magic link keeps your Company of One yours. Enter your email and we'll send a one-tap sign-in link.</p>
+    <div class="ob-step">
+      <div class="ob-step-head"><span class="ob-num done">✓</span><strong>Connected to Supabase</strong></div>
+      <p id="loginConnLine">—</p>
+    </div>
+    <div class="ob-step">
+      <div class="ob-step-head"><span class="ob-num">→</span><strong>Sign in with a magic link</strong></div>
+      <div class="form-row"><input id="loginEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
+      <button class="btn btn-primary" onclick="sendMagicLink()">Send magic link</button>
+      <div class="ob-status" id="loginStatus"></div>
+    </div>
+    <div class="ob-footer">
+      <button class="demo-link" onclick="startDemo()">Explore in demo mode instead →</button>
     </div>
   </div>
 </div>
@@ -264,7 +309,7 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
   <div class="right-panel">
     <nav>
       <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
-      <button class="nav-btn" data-tab="soul">Soul</button>
+      <button class="nav-btn coming-soon" data-tab="soul" disabled title="Coming soon">Soul<span class="soon-badge">soon</span></button>
       <button class="nav-btn" data-tab="body">Body</button>
       <button class="nav-btn" data-tab="heart">Heart</button>
       <button class="nav-btn" data-tab="mind">Mind</button>
@@ -288,15 +333,12 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
         <ul class="element-list" id="dashTiles"><!-- rendered --></ul>
       </div>
 
-      <!-- SOUL (gentle static for MVP) -->
+      <!-- SOUL (coming soon) -->
       <div id="soul" class="tab-content">
-        <div class="dashboard-header"><h1>Soul (Ruh)</h1><p>Anchor your purpose before you begin.</p></div>
-        <div class="page-intro" style="border-left-color:var(--accent-green)">Today's intention is not volume, but presence. Have you connected with your Source before connecting with your clients? This space stays unmeasured on purpose — <em>rūḥ</em> is not a metric.</div>
-        <div class="checklist">
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Morning Dhikr / Meditation</div>
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Set intention for work (Niyyah)</div>
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Read 5 pages of beneficial knowledge</div>
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;font-size:.9rem"><input type="checkbox"> Silence / nature walk (10 mins)</div>
+        <div class="coming-soon-panel">
+          <div class="cs-icon">✨</div>
+          <h2>Soul (Ruh) — coming soon</h2>
+          <p><em>rūḥ</em> is not a metric. This space is being tended with care and will open in a later season.</p>
         </div>
       </div>
 
@@ -307,7 +349,7 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
           <button class="body-sub active" data-sub="sustenance" onclick="switchBodyTab('sustenance')">Sustenance (Money)</button>
           <button class="body-sub" data-sub="invoices" onclick="switchBodyTab('invoices')">Invoices</button>
           <button class="body-sub" data-sub="statements" onclick="switchBodyTab('statements')">Statements</button>
-          <button class="body-sub" data-sub="health" onclick="switchBodyTab('health')">Health &amp; Energy</button>
+          <button class="body-sub coming-soon" data-sub="health" disabled title="Coming soon">Health &amp; Energy<span class="soon-badge">soon</span></button>
         </div>
 
         <!-- Sustenance: transactions -->
@@ -370,16 +412,32 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
         </div>
       </div>
 
-      <!-- HEART (gentle static for MVP) -->
+      <!-- HEART = relationships & connection (measurable, live) -->
       <div id="heart" class="tab-content">
-        <div class="dashboard-header"><h1>Heart (Qalb)</h1><p>Tending to relationships and emotions.</p></div>
-        <div class="page-intro" style="border-left-color:var(--accent-rose)">The heart is the general of the body. Who needs your tenderness today? This space also stays soft — connection is witnessed here, not scored.</div>
-        <div class="checklist">
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Weekly Mama practice</div>
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Check in with R — mirror, not manager</div>
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Family time (phone free)</div>
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;font-size:.9rem"><input type="checkbox"> Self-compassion pause — kindness inward first</div>
+        <div class="dashboard-header"><h1>Heart (Qalb)</h1><p>Tending to relationships and emotions — witnessed, and now gently counted.</p></div>
+        <div class="page-intro" style="border-left-color:var(--accent-rose)">The heart is the general of the body. This stays soft: we don't score love, we only notice whether the week held space for it. Log a moment of connection — the streak is a nudge, not a judge.</div>
+        <div class="form-card">
+          <div class="form-title">Log a moment of connection</div>
+          <div class="form-row">
+            <select id="hKind">
+              <option value="mama">Mama practice</option>
+              <option value="partner">Check-in with R</option>
+              <option value="family">Family time (phone-free)</option>
+              <option value="self">Self-compassion pause</option>
+              <option value="other">Other tenderness</option>
+            </select>
+            <input id="hDate" type="date">
+          </div>
+          <div class="form-row">
+            <input id="hDetail" placeholder="A word on how it went (optional)">
+            <button class="btn btn-primary" onclick="addHeartLog()">Log it</button>
+          </div>
         </div>
+        <div class="stat-grid" id="heartKpis"></div>
+        <h3 class="section-h">This week's tending</h3>
+        <div id="heartPractices"></div>
+        <h3 class="section-h">Recent moments</h3>
+        <div id="heartWrap"></div>
       </div>
 
       <!-- MIND = MODULE 2 TIME -->
@@ -555,6 +613,18 @@ create table if not exists plc_log (
   created_at timestamptz default now()
 );
 
+-- ---------- HEART (Qalb) · relationships & connection ----------
+
+create table if not exists heart_logs (
+  id uuid primary key default gen_random_uuid(),
+  log_date date not null default current_date,
+  kind text not null
+    check (kind in ('mama','partner','family','self','other')),
+  detail text,
+  created_by text not null default 'sha',
+  created_at timestamptz default now()
+);
+
 -- ---------- SECURITY (single-user, anon key) ----------
 -- MVP: RLS enabled with permissive policies for the anon role.
 -- Your anon key is the password to this data — do not publish the
@@ -568,11 +638,12 @@ alter table time_blocks     enable row level security;
 alter table journal_entries enable row level security;
 alter table weekly_reviews  enable row level security;
 alter table plc_log         enable row level security;
+alter table heart_logs      enable row level security;
 
 do $$
 declare t text;
 begin
-  foreach t in array array['categories','transactions','invoices','time_blocks','journal_entries','weekly_reviews','plc_log']
+  foreach t in array array['categories','transactions','invoices','time_blocks','journal_entries','weekly_reviews','plc_log','heart_logs']
   loop
     execute format('drop policy if exists "anon full access" on %I', t);
     execute format('create policy "anon full access" on %I for all using (true) with check (true)', t);
@@ -594,7 +665,7 @@ const state = {
   sb: null,
   range: 'month',
   floor: Number(store.get('tt_floor') || 10000),
-  cache: { transactions:[], invoices:[], time_blocks:[], journal_entries:[], weekly_reviews:[] }
+  cache: { transactions:[], invoices:[], time_blocks:[], journal_entries:[], weekly_reviews:[], heart_logs:[] }
 };
 
 const RM = n => 'RM ' + Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -607,7 +678,7 @@ function weekStart(d){ const x=new Date(d); const day=(x.getDay()+6)%7; x.setDat
 /* ═══════════ DATA LAYER ═══════════ */
 const TABLES = {
   transactions:'tx_date', invoices:'issue_date', time_blocks:'block_date',
-  journal_entries:'entry_date', weekly_reviews:'week_start'
+  journal_entries:'entry_date', weekly_reviews:'week_start', heart_logs:'log_date'
 };
 
 const db = {
@@ -742,6 +813,11 @@ function renderStatements(){
   const income = incomeRows.reduce((s,[,v])=>s+v,0), expense = expenseRows.reduce((s,[,v])=>s+v,0);
   const cashAllTime = all.reduce((s,t)=>s+(t.kind==='income'?1:-1)*Number(t.amount),0);
   const receivable = state.cache.invoices.filter(i=>['sent','overdue'].includes(i.status)).reduce((s,i)=>s+Number(i.amount),0);
+  const {from} = rangeBounds();
+  const fromISO = from.toISOString().slice(0,10);
+  const opening = all.filter(t=>new Date(t.tx_date) < from).reduce((s,t)=>s+(t.kind==='income'?1:-1)*Number(t.amount),0);
+  const netRange = income - expense;
+  const closingCash = opening + netRange;
   const line = ([k,v]) => `<tr><td style="padding-left:1.2rem">${esc(k)}</td><td class="num">${RM(v)}</td></tr>`;
 
   document.getElementById('statementsWrap').innerHTML = `
@@ -762,10 +838,21 @@ function renderStatements(){
       <tr><td style="padding-left:1.2rem">Cash (cumulative net of all transactions)</td><td class="num">${RM(cashAllTime)}</td></tr>
       <tr><td style="padding-left:1.2rem">Accounts receivable (sent + overdue invoices)</td><td class="num">${RM(receivable)}</td></tr>
       <tr><td><strong>Total assets</strong></td><td class="num"><strong>${RM(cashAllTime+receivable)}</strong></td></tr>
-      <tr><td><strong>Liabilities</strong></td><td class="num">RM 0.00</td></tr>
+      <tr><td><strong>Liabilities</strong></td><td class="num"></td></tr>
+      <tr><td style="padding-left:1.2rem;color:#999">None tracked yet</td><td class="num">RM 0.00</td></tr>
+      <tr><td><strong>Total liabilities</strong></td><td class="num"><strong>RM 0.00</strong></td></tr>
       <tr><td style="font-family:'Lora',serif"><strong>Owner's equity</strong></td><td class="num"><strong>${RM(cashAllTime+receivable)}</strong></td></tr>
     </tbody></table>
-    <p style="font-size:.75rem;color:var(--text-light);line-height:1.5">Cash-basis MVP. Liabilities and asset classes can be added as tables when needed — the structure is already audit-legible: every line above traces to a dated, sourced row.</p>`;
+
+    <h3 class="section-h">Equity movement — ${label} (audit trail)</h3>
+    <table class="data-table"><tbody>
+      <tr><td>Opening cash equity (before ${fromISO})</td><td class="num">${RM(opening)}</td></tr>
+      <tr><td style="padding-left:1.2rem">+ Net profit this period (cash)</td><td class="num ${netRange>=0?'metric-good':'metric-warning'}">${netRange<0?'−':''}${RM(Math.abs(netRange))}</td></tr>
+      <tr><td><strong>= Closing cash equity</strong></td><td class="num"><strong>${RM(closingCash)}</strong></td></tr>
+      <tr><td style="padding-left:1.2rem">+ Accounts receivable (accrual-adjacent)</td><td class="num">${RM(receivable)}</td></tr>
+      <tr><td style="font-family:'Lora',serif"><strong>= Owner's equity today</strong></td><td class="num"><strong>${RM(closingCash+receivable)}</strong></td></tr>
+    </tbody></table>
+    <p style="font-size:.75rem;color:var(--text-light);line-height:1.5">Beyond pure cash-basis: the closing balance reconciles opening equity + this period's net, and receivables are surfaced as an accrual-adjacent asset. Every line traces to a dated, sourced row — audit-legible. Add liability/asset tables when an accountant asks; the reconciliation already holds.</p>`;
 }
 
 /* ═══════════ RENDER: TIME ═══════════ */
@@ -827,10 +914,59 @@ function renderReviews(){
     : `<p class="empty-note">First weekly review pending. Friday is waiting.</p>`;
 }
 
+/* ═══════════ RENDER: HEART ═══════════ */
+const HEART_KINDS = {mama:'Mama practice', partner:'Check-in with R', family:'Family time (phone-free)', self:'Self-compassion pause', other:'Other tenderness'};
+const HEART_CORE = ['mama','partner','family','self'];
+
+function heartStreak(dateStrs){
+  const set = new Set(dateStrs);
+  let streak = 0; const d = new Date();
+  if (!set.has(d.toISOString().slice(0,10))) d.setDate(d.getDate()-1);
+  while (set.has(d.toISOString().slice(0,10))){ streak++; d.setDate(d.getDate()-1); }
+  return streak;
+}
+
+function heartNumbers(){
+  const ws = weekStart(new Date());
+  const logs = state.cache.heart_logs || [];
+  const week = logs.filter(l=>l.log_date>=ws);
+  const doneKinds = new Set(week.filter(l=>HEART_CORE.includes(l.kind)).map(l=>l.kind));
+  return { ws, weekCount: week.length, tended: doneKinds.size, doneKinds,
+           streak: heartStreak(logs.map(l=>l.log_date)) };
+}
+
+function renderHeart(){
+  const h = heartNumbers();
+  document.getElementById('heartKpis').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Tended this week</div>
+      <div class="stat-val ${h.tended>=3?'metric-good':'metric-neutral'}">${h.tended}/4</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${h.tended/4*100}%;background:#fb7185"></div></div>
+      <div class="stat-sub">core practices touched</div></div>
+    <div class="stat-card"><div class="stat-label">Moments logged</div><div class="stat-val">${h.weekCount}</div><div class="stat-sub">this week</div></div>
+    <div class="stat-card"><div class="stat-label">Day streak</div><div class="stat-val">${h.streak?('🔥 '+h.streak):'—'}</div><div class="stat-sub">days with a moment</div></div>`;
+
+  document.getElementById('heartPractices').innerHTML = HEART_CORE.map(k=>{
+    const done = h.doneKinds.has(k);
+    return `<div class="practice-row"><span class="practice-dot ${done?'done':'todo'}">${done?'✓':''}</span><span>${esc(HEART_KINDS[k])}</span><span style="flex:1"></span><span style="font-size:.78rem;color:${done?'#15803d':'#9ca3af'}">${done?'tended':'waiting'}</span></div>`;
+  }).join('');
+
+  const logs = (state.cache.heart_logs||[]).slice(0,12);
+  document.getElementById('heartWrap').innerHTML = logs.length ? `
+    <table class="data-table"><thead><tr><th>Date</th><th>Kind</th><th>Note</th><th>By</th></tr></thead><tbody>
+    ${logs.map(l=>`<tr>
+      <td>${esc(l.log_date)}</td>
+      <td><span class="tag tag-heart">${esc(HEART_KINDS[l.kind]||l.kind)}</span></td>
+      <td>${esc(l.detail||'')}</td>
+      <td>${l.created_by==='hermes'?'<span class="tag tag-hermes">Hermes</span>':''}</td>
+    </tr>`).join('')}</tbody></table>`
+    : `<p class="empty-note">No moments logged yet this season. Tend to one relationship today — even a two-minute check-in counts.</p>`;
+}
+
 /* ═══════════ RENDER: DASHBOARD ═══════════ */
 function renderDashboard(){
   const n = moneyNumbers();
   const p = paretoNumbers();
+  const h = heartNumbers();
   const j = state.cache.journal_entries[0];
   const pendingApproval = state.cache.journal_entries.filter(e=>!e.approved).length;
   const {label} = rangeBounds();
@@ -853,10 +989,10 @@ function renderDashboard(){
       <div class="stat-sub">Irori + AIS of work time</div></div>`;
 
   document.getElementById('dashTiles').innerHTML = `
-    <li class="element-item" onclick="goTo('soul')">
+    <li class="element-item coming-soon">
       <span class="element-icon">✨</span>
-      <div class="element-content"><div class="element-title">Soul (Ruh)</div>
-      <div class="element-details"><span class="detail-item">Unmeasured, by design</span><span class="detail-item">Niyyah before numbers</span></div></div>
+      <div class="element-content"><div class="element-title">Soul (Ruh)<span class="soon-badge">soon</span></div>
+      <div class="element-details"><span class="detail-item">A later season</span></div></div>
     </li>
     <li class="element-item" onclick="goTo('body')">
       <span class="element-icon">🌍</span>
@@ -869,7 +1005,10 @@ function renderDashboard(){
     <li class="element-item" onclick="goTo('heart')">
       <span class="element-icon">❤️</span>
       <div class="element-content"><div class="element-title">Heart (Qalb)</div>
-      <div class="element-details"><span class="detail-item">Witnessed, not scored</span><span class="detail-item">Mama practice · R · family</span></div></div>
+      <div class="element-details">
+        <span class="detail-item">Tended this week: <span class="${h.tended>=3?'metric-good':'metric-neutral'}">${h.tended}/4</span></span>
+        ${h.streak?`<span class="detail-item">🔥 ${h.streak}-day streak</span>`:''}
+      </div></div>
     </li>
     <li class="element-item" onclick="goTo('mind')">
       <span class="element-icon">💡</span>
@@ -884,7 +1023,7 @@ function renderDashboard(){
 
 function renderAll(){
   renderDashboard(); renderMoney(); renderInvoices(); renderStatements();
-  renderTime(); renderJournal(); renderReviews();
+  renderTime(); renderJournal(); renderReviews(); renderHeart();
 }
 
 /* ═══════════ ACTIONS ═══════════ */
@@ -965,6 +1104,17 @@ async function saveReview(){
   await db.list('weekly_reviews'); renderAll(); toast('Review saved');
 }
 
+async function addHeartLog(){
+  await db.insert('heart_logs',{
+    kind: document.getElementById('hKind').value,
+    log_date: document.getElementById('hDate').value || todayISO(),
+    detail: document.getElementById('hDetail').value || null,
+    created_by:'sha'
+  });
+  document.getElementById('hDetail').value='';
+  renderAll(); toast('A moment, witnessed');
+}
+
 /* ═══════════ NAV & UI ═══════════ */
 const sectionData = {
   dashboard:{quote:'"Your business is a garden, not a factory. Sustainable growth requires rest, boundaries, and seasons of quiet growth beneath the soil."',author:'(Sustainable Solopreneur Wisdom)',icon:'<rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>',cls:''},
@@ -1029,24 +1179,52 @@ function copyMcpConfig(){
 }
 
 async function testAndConnect(){
-  const url = document.getElementById('obUrl').value.trim();
+  const url = document.getElementById('obUrl').value.trim().replace(/\/$/,'');
   const key = document.getElementById('obKey').value.trim();
   const st = document.getElementById('obStatus');
   if (!url || !key){ st.textContent='Both fields needed.'; st.className='ob-status err'; return; }
   st.textContent='Testing…'; st.className='ob-status';
   try {
-    const sb = window.supabase.createClient(url,key);
-    const { error } = await sb.from('transactions').select('id').limit(1);
-    if (error) throw error;
-    state.sb = sb; state.mode='live';
+    const res = await fetch(url+'/rest/v1/',{ headers:{ apikey:key, Authorization:'Bearer '+key } });
+    if (res.status===401 || res.status===403) throw new Error('Invalid anon key');
+    if (!res.ok && res.status!==404) throw new Error('HTTP '+res.status);
+    state.sb = window.supabase.createClient(url,key);
     store.set('tt_url',url); store.set('tt_key',key);
-    st.textContent='Connected. The schema is in place — masyaAllah, you\'re live.'; st.className='ob-status ok';
+    st.textContent='Connected. Next: sign in with a magic link.'; st.className='ob-status ok';
     document.getElementById('obNum2').classList.add('done'); document.getElementById('obNum2').textContent='✓';
     document.getElementById('enterBtn').disabled=false;
   } catch(e){
-    st.textContent='Could not connect: '+(e.message||e)+'. Check the URL, key, and that schema.sql has been run.';
+    st.textContent='Could not connect: '+(e.message||e)+'. Check the URL and anon key.';
     st.className='ob-status err';
   }
+}
+
+/* ═══════════ AUTH (magic link) ═══════════ */
+function cleanAuthHash(){
+  if (location.hash && (location.hash.includes('access_token')||location.hash.includes('error'))){
+    history.replaceState(null,'',location.pathname+location.search);
+  }
+}
+function showLogin(){
+  document.getElementById('onboardOverlay').classList.add('hidden');
+  document.getElementById('loginOverlay').classList.remove('hidden');
+  document.getElementById('loginConnLine').textContent = 'Live: '+(store.get('tt_url')||'Supabase');
+}
+async function sendMagicLink(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const st = document.getElementById('loginStatus');
+  if (!email){ st.textContent='Enter your email.'; st.className='ob-status err'; return; }
+  if (!state.sb){ st.textContent='Not connected to Supabase yet.'; st.className='ob-status err'; return; }
+  st.textContent='Sending…'; st.className='ob-status';
+  try {
+    const { error } = await state.sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: location.origin+location.pathname } });
+    if (error) throw error;
+    st.textContent='Check your inbox — tap the link to enter. You can close this tab after.'; st.className='ob-status ok';
+  } catch(e){ st.textContent='Could not send link: '+(e.message||e); st.className='ob-status err'; }
+}
+async function signOutUser(){
+  try { if (state.sb) await state.sb.auth.signOut(); } catch(e){}
+  location.reload();
 }
 
 function seedDemo(){
@@ -1065,6 +1243,10 @@ function seedDemo(){
   state.cache.journal_entries=[
     {id:uid(),entry_date:t,title:'Sample Hermes draft',content:'Extracted from Yayday: worksheet #3 shipped, energy steady, luteal-phase pacing respected.',tags:['yayday'],source:'hermes',approved:false}
   ];
+  state.cache.heart_logs=[
+    {id:uid(),log_date:t,kind:'mama',detail:'Sample — called Mama, no agenda',created_by:'sha'},
+    {id:uid(),log_date:t,kind:'self',detail:'Sample — rest without guilt',created_by:'sha'}
+  ];
 }
 
 function startDemo(){
@@ -1074,6 +1256,7 @@ function startDemo(){
 
 function enterApp(demo){
   document.getElementById('onboardOverlay').classList.add('hidden');
+  document.getElementById('loginOverlay').classList.add('hidden');
   document.getElementById('appShell').style.visibility='visible';
   const pill = document.getElementById('connPill');
   if (state.mode==='live'){ pill.textContent='● live · supabase'; pill.className='conn-pill live'; }
@@ -1085,6 +1268,7 @@ function openSettings(){
   document.getElementById('setFloor').value = state.floor;
   document.getElementById('settingsConnLine').textContent =
     state.mode==='live' ? 'Connected live to '+(store.get('tt_url')||'Supabase') : 'Demo mode — data is not persisted.';
+  document.getElementById('signOutBtn').style.display = state.mode==='live' ? 'inline' : 'none';
   document.getElementById('settingsOverlay').classList.remove('hidden');
 }
 function closeSettings(){ document.getElementById('settingsOverlay').classList.add('hidden'); }
@@ -1098,19 +1282,68 @@ function disconnect(){
   location.reload();
 }
 
+/* ═══════════ GCAL / ICS IMPORT (manual, Module 2 v2) ═══════════ */
+function parseIcsDate(v){
+  const m = String(v).match(/(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})(Z)?)?/);
+  if (!m) return null;
+  const [,Y,Mo,D,h,mi,s,z] = m;
+  if (h===undefined) return { date:new Date(Number(Y),Number(Mo)-1,Number(D)), allDay:true };
+  if (z==='Z')       return { date:new Date(Date.UTC(Number(Y),Number(Mo)-1,Number(D),Number(h),Number(mi),Number(s||0))), allDay:false };
+  return { date:new Date(Number(Y),Number(Mo)-1,Number(D),Number(h),Number(mi),Number(s||0)), allDay:false };
+}
+
+async function importIcs(){
+  const f = document.getElementById('icsFile').files[0];
+  const st = document.getElementById('icsStatus');
+  if (!f){ st.textContent='Choose a .ics file first.'; st.className='ob-status err'; return; }
+  if (state.mode!=='live' && state.mode!=='demo'){ st.textContent='Connect first.'; st.className='ob-status err'; return; }
+  st.textContent='Reading…'; st.className='ob-status';
+  const raw = await f.text();
+  const lines = raw.replace(/\r\n/g,'\n').replace(/\n[ \t]/g,'').split('\n');
+  const domain = document.getElementById('icsDomain').value;
+  const isWork = document.getElementById('icsWork').checked;
+  const toInsert = []; let ev = null, skipped = 0;
+  for (const line of lines){
+    if (line.startsWith('BEGIN:VEVENT')){ ev = {}; continue; }
+    if (line.startsWith('END:VEVENT')){
+      const start = ev && ev.start ? parseIcsDate(ev.start) : null;
+      const end   = ev && ev.end   ? parseIcsDate(ev.end)   : null;
+      if (start){
+        let minutes = 60;
+        if (end && !start.allDay) minutes = Math.max(5, Math.round((end.date - start.date)/60000));
+        toInsert.push({ title:(ev.summary||'Imported event').slice(0,200), domain, minutes,
+          block_date:start.date.toISOString().slice(0,10), is_work:isWork, source:'gcal' });
+      } else skipped++;
+      ev = null; continue;
+    }
+    if (!ev) continue;
+    if (line.startsWith('SUMMARY'))     ev.summary = line.split(':').slice(1).join(':').trim();
+    else if (line.startsWith('DTSTART')) ev.start = line.split(':').slice(1).join(':').trim();
+    else if (line.startsWith('DTEND'))   ev.end   = line.split(':').slice(1).join(':').trim();
+  }
+  if (!toInsert.length){ st.textContent='No calendar events found in that file.'; st.className='ob-status err'; return; }
+  let count = 0;
+  for (const row of toInsert){ const r = await db.insert('time_blocks',row); if (r) count++; }
+  st.textContent=`Imported ${count} event(s)${skipped?`, skipped ${skipped}`:''} as time blocks.`; st.className='ob-status ok';
+  document.getElementById('icsFile').value='';
+  renderAll(); toast(`Imported ${count} time block(s)`);
+}
+
 /* ═══════════ BOOT ═══════════ */
 (async function boot(){
   document.getElementById('txDate').value = todayISO();
   document.getElementById('tbDate').value = todayISO();
   document.getElementById('jDate').value = todayISO();
+  document.getElementById('hDate').value = todayISO();
   document.getElementById('wrWeek').value = weekStart(new Date());
 
   const url = store.get('tt_url'), key = store.get('tt_key');
   if (url && key && window.supabase){
     try {
-      const sb = window.supabase.createClient(url,key);
-      const { error } = await sb.from('transactions').select('id').limit(1);
-      if (!error){ state.sb=sb; state.mode='live'; enterApp(); return; }
+      state.sb = window.supabase.createClient(url,key);
+      const { data:{ session } } = await state.sb.auth.getSession();
+      if (session){ state.mode='live'; cleanAuthHash(); enterApp(); return; }
+      showLogin(); return;
     } catch(e){ /* fall through to onboarding */ }
   }
   // show onboarding
