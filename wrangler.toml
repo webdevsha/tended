@@ -1,0 +1,10 @@
+# Cloudflare Pages config for Tended.Today
+# Static single-page site (index.html at the repo root). No build step.
+#
+# Deploy options:
+#   A) Dashboard: Cloudflare → Workers & Pages → Create → Pages → Connect to Git
+#      → pick webdevsha/tended. Build command: (leave empty). Output dir: /
+#   B) CLI:  npx wrangler pages deploy . --project-name tended
+name = "tended"
+compatibility_date = "2024-07-01"
+pages_build_output_dir = "."
