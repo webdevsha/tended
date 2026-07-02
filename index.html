@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tended.Today — Company of One OS</title>
+<meta name="description" content="Building a business doesn't have to mean burning out. Tend to your soul, heart, and company of one.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --accent-yellow:#ffe97a; --accent-green:#dcfce7; --accent-rose:#ffe4e6;
+  --accent-blue:#e0f2fe; --accent-orange:#ffedd5;
+  --bg-white:rgba(255,255,255,.95); --text-dark:#2f3237; --text-gray:#626364;
+  --text-light:#8e8e8e; --border-light:rgba(0,0,0,.05);
+}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;
+  background-image:url('https://images.unsplash.com/photo-1500964757637-c85e8a162699?q=80&w=2000');
+  background-size:cover;background-position:center;background-attachment:fixed}
+.container{background:var(--bg-white);backdrop-filter:blur(10px);border-radius:2px;box-shadow:0 20px 60px rgba(0,0,0,.3);
+  display:grid;grid-template-columns:40% 60%;width:1040px;max-width:100%;min-height:640px;overflow:hidden;border:1px solid rgba(255,255,255,.2)}
+
+/* Left panel */
+.left-panel{background:linear-gradient(135deg,var(--accent-yellow) 0%,#f9e376 100%);padding:3rem;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;transition:background .5s ease}
+.left-panel.soul-mode{background:linear-gradient(135deg,#dcfce7,#bbf7d0)}
+.left-panel.heart-mode{background:linear-gradient(135deg,#ffe4e6,#fecdd3)}
+.left-panel.mind-mode{background:linear-gradient(135deg,#e0f2fe,#bae6fd)}
+.left-panel.body-mode{background:linear-gradient(135deg,#ffedd5,#fed7aa)}
+.icon-large{width:80px;height:80px;margin-bottom:2rem;opacity:.9}
+.quote-container{text-align:left;width:100%}
+.quote-anim{animation:fadeInUp .7s ease-out .1s both}
+blockquote{font-family:'Lora',serif;font-size:1.4rem;line-height:1.4;color:var(--text-dark);margin-bottom:1rem;font-style:italic}
+cite{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(0,0,0,.6);font-style:normal;margin-top:1rem}
+.conn-pill{position:absolute;bottom:1rem;left:1rem;font-size:.7rem;padding:.3rem .7rem;border-radius:50px;background:rgba(255,255,255,.5);color:#444;letter-spacing:.05em}
+.conn-pill.live{background:#dcfce7;color:#166534}
+.conn-pill.demo{background:#fef3c7;color:#92400e}
+
+/* Right panel */
+.right-panel{padding:2rem 2.5rem;display:flex;flex-direction:column;height:100%;overflow:hidden;background:#fff}
+nav{display:flex;gap:1.4rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border-light);flex-wrap:wrap;align-items:center;font-size:.875rem}
+nav button{background:none;border:none;font:inherit;cursor:pointer;color:var(--text-gray);transition:all .3s;position:relative;padding:0}
+nav button:hover{color:var(--text-dark)}
+nav button.active{color:var(--text-dark);font-weight:600}
+nav button.active::after{content:'';position:absolute;bottom:-17px;left:0;width:100%;height:2px;background:var(--accent-yellow)}
+nav button[data-tab="soul"].active::after{background:#86efac}
+nav button[data-tab="body"].active::after{background:#fdba74}
+nav button[data-tab="heart"].active::after{background:#fda4af}
+nav button[data-tab="mind"].active::after{background:#7dd3fc}
+nav .spacer{flex:1}
+.settings-link{display:flex;align-items:center;gap:.4rem;color:var(--text-light);background:none;border:none;font:inherit;font-size:.875rem;cursor:pointer}
+.settings-link:hover{color:var(--text-dark)}
+main{flex:1;overflow-y:auto;padding-right:.5rem;position:relative}
+main::-webkit-scrollbar{width:6px}
+main::-webkit-scrollbar-track{background:rgba(0,0,0,.05);border-radius:10px}
+main::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:10px}
+
+.tab-content{display:none;animation:fadeIn .4s ease-out}
+.tab-content.active{display:block}
+.sub-nav{display:flex;gap:.6rem;margin-bottom:1.25rem;border-bottom:1px solid var(--border-light);padding-bottom:.5rem;flex-wrap:wrap}
+.sub-nav button{background:none;border:none;padding:.45rem .9rem;cursor:pointer;font:inherit;font-size:.85rem;color:var(--text-gray);border-radius:4px;transition:all .2s}
+.sub-nav button:hover{background:rgba(0,0,0,.02);color:var(--text-dark)}
+.sub-nav button.active{background:var(--accent-orange);color:#9a3412;font-weight:600}
+#mind .sub-nav button.active{background:var(--accent-blue);color:#0369a1}
+.sub-tab-content{animation:fadeIn .4s ease-out}
+
+.dashboard-header{margin-bottom:1.5rem}
+.dashboard-header h1{font-size:1.5rem;font-family:'Lora',serif;color:var(--text-dark);margin-bottom:.35rem}
+.dashboard-header p{color:var(--text-gray);font-style:italic;font-size:.875rem}
+
+.element-list{list-style:none;display:flex;flex-direction:column;gap:1.1rem}
+.element-item{display:flex;align-items:flex-start;gap:1rem;padding:.5rem;border-radius:8px;cursor:pointer;transition:all .3s}
+.element-item:hover{background:rgba(0,0,0,.02)}
+.element-icon{font-size:1.4rem;flex-shrink:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:#f8f9fa;border-radius:8px}
+.element-title{font-weight:600;color:var(--text-dark);margin-bottom:.4rem}
+.element-details{font-size:.85rem;color:var(--text-gray);line-height:1.6}
+.detail-item{display:inline-block}
+.detail-item:not(:last-child)::after{content:"•";margin:0 .5rem;color:rgba(0,0,0,.2)}
+.metric-good{color:#15803d;font-weight:500}
+.metric-warning{color:#c2410c;font-weight:500}
+.metric-neutral{color:#4b5563;font-weight:500}
+
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.8rem;margin-bottom:1.5rem}
+.stat-card{background:#f8f9fa;padding:.9rem 1rem;border-radius:8px;border:1px solid rgba(0,0,0,.05)}
+.stat-label{font-size:.75rem;color:var(--text-gray);margin-bottom:.25rem}
+.stat-val{font-size:1.2rem;font-weight:600;color:var(--text-dark)}
+.stat-sub{font-size:.72rem;color:#8a8a8a;margin-top:.2rem}
+
+.data-table{width:100%;border-collapse:collapse;margin-bottom:1.5rem;font-size:.85rem}
+.data-table th,.data-table td{text-align:left;padding:.6rem .5rem;border-bottom:1px solid var(--border-light);vertical-align:top}
+.data-table th{font-weight:600;color:var(--text-gray);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}
+.data-table .num{text-align:right;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;padding:.18rem .5rem;border-radius:4px;font-size:.72rem;font-weight:500;white-space:nowrap}
+.tag-draft{background:#f3f4f6;color:#374151}
+.tag-sent{background:#e0f2fe;color:#075985}
+.tag-paid{background:#dcfce7;color:#166534}
+.tag-overdue{background:#fee2e2;color:#991b1b}
+.tag-void{background:#f3f4f6;color:#9ca3af;text-decoration:line-through}
+.tag-hermes{background:#ede9fe;color:#5b21b6}
+.tag-income{background:#dcfce7;color:#166534}
+.tag-expense{background:#ffedd5;color:#9a3412}
+
+.page-intro{background:#f8f9fa;padding:.9rem 1rem;border-radius:8px;margin-bottom:1.25rem;font-size:.85rem;color:#555;line-height:1.5;border-left:3px solid #ddd}
+
+/* Forms */
+.form-card{background:#fbfbfa;border:1px solid var(--border-light);border-radius:8px;padding:1rem;margin-bottom:1.5rem}
+.form-title{font-size:.8rem;font-weight:600;color:var(--text-gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem}
+.form-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.6rem}
+.form-row:last-child{margin-bottom:0}
+input,select,textarea{font:inherit;font-size:.85rem;padding:.5rem .6rem;border:1px solid #ddd;border-radius:6px;background:#fff;color:var(--text-dark);flex:1;min-width:110px}
+textarea{width:100%;resize:vertical;min-height:60px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent-yellow);border-color:transparent}
+.btn{font:inherit;font-size:.82rem;font-weight:600;padding:.5rem 1rem;border:none;border-radius:6px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-primary{background:var(--text-dark);color:#fff}
+.btn-primary:hover{background:#000}
+.btn-soft{background:#f0f0ef;color:var(--text-dark)}
+.btn-soft:hover{background:#e6e6e4}
+.btn-tiny{font-size:.72rem;padding:.28rem .6rem;border-radius:5px;background:#f0f0ef;border:none;cursor:pointer;font-weight:500}
+.btn-tiny:hover{background:#e2e2e0}
+.btn-yellow{background:var(--accent-yellow);color:#5c4d00}
+.btn-yellow:hover{background:#f7de55}
+
+.progress-track{height:8px;background:#eee;border-radius:4px;overflow:hidden;margin-top:.5rem}
+.progress-fill{height:100%;border-radius:4px;transition:width .5s ease}
+
+.empty-note{font-size:.85rem;color:var(--text-light);font-style:italic;padding:1rem 0}
+.section-h{margin:1.25rem 0 .75rem;font-size:.95rem;color:#444;font-family:'Lora',serif}
+
+/* Journal cards */
+.journal-card{border:1px solid var(--border-light);border-radius:8px;padding:.9rem 1rem;margin-bottom:.7rem;background:#fff}
+.journal-card.pending{background:#faf7ff;border-color:#ddd6fe}
+.journal-meta{font-size:.72rem;color:var(--text-light);margin-bottom:.35rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.journal-body{font-size:.85rem;color:var(--text-dark);line-height:1.55;white-space:pre-wrap}
+
+/* Onboarding overlay */
+.overlay{position:fixed;inset:0;background:rgba(30,28,24,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem}
+.overlay.hidden{display:none}
+.onboard{background:#fffdf8;border-radius:10px;width:560px;max-width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.4);padding:2.25rem}
+.onboard h2{font-family:'Lora',serif;font-size:1.4rem;margin-bottom:.4rem;color:var(--text-dark)}
+.onboard .sub{font-size:.85rem;color:var(--text-gray);margin-bottom:1.5rem;font-style:italic}
+.ob-step{border:1px solid #eee8da;border-radius:8px;padding:1rem 1.1rem;margin-bottom:.9rem;background:#fff}
+.ob-step-head{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem}
+.ob-num{width:22px;height:22px;border-radius:50%;background:var(--accent-yellow);color:#5c4d00;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ob-num.done{background:#dcfce7;color:#166534}
+.ob-step-head strong{font-size:.9rem;color:var(--text-dark)}
+.ob-step p{font-size:.8rem;color:var(--text-gray);line-height:1.5;margin-bottom:.6rem}
+.ob-status{font-size:.78rem;margin-top:.5rem;min-height:1em}
+.ob-status.ok{color:#15803d}
+.ob-status.err{color:#b91c1c}
+.ob-footer{display:flex;gap:.7rem;justify-content:flex-end;align-items:center;margin-top:1.25rem;flex-wrap:wrap}
+.demo-link{font-size:.8rem;color:var(--text-gray);background:none;border:none;cursor:pointer;text-decoration:underline}
+code.inline{background:#f4f1ea;padding:.1rem .35rem;border-radius:4px;font-size:.78rem}
+
+/* Settings drawer (reuses overlay) */
+.toast{position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);background:var(--text-dark);color:#fff;font-size:.82rem;padding:.6rem 1.1rem;border-radius:50px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+
+footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-light)}
+.view-toggle{display:flex;gap:.25rem;align-items:center;justify-content:center;background:rgba(0,0,0,.04);padding:.375rem;border-radius:50px;max-width:480px;margin:0 auto}
+.view-toggle button{flex:1;display:flex;align-items:center;justify-content:center;gap:.35rem;padding:.5rem .75rem;border:none;background:transparent;border-radius:50px;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;transition:all .3s;color:var(--text-light);white-space:nowrap}
+.view-toggle button:hover{color:var(--text-dark);background:rgba(255,255,255,.6)}
+.view-toggle button.active{background:#fff;color:var(--text-dark);box-shadow:0 2px 4px rgba(0,0,0,.08);font-weight:700}
+
+@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.fade-in{animation:fadeInUp .5s ease-out}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:768px){
+  .container{grid-template-columns:1fr;min-height:auto}
+  .left-panel{padding:2rem;min-height:180px}
+  .right-panel{padding:1.25rem}
+  blockquote{font-size:1.1rem}
+  nav{gap:1rem;overflow-x:auto;white-space:nowrap;padding-bottom:.5rem}
+  nav::-webkit-scrollbar{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ ONBOARDING ═══════════ -->
+<div class="overlay" id="onboardOverlay">
+  <div class="onboard">
+    <h2>Selamat datang. Let's make it live.</h2>
+    <p class="sub">One database, three surfaces: this dashboard, an API for future apps, and MCP tools for Hermes. Fifteen minutes, once.</p>
+
+    <div class="ob-step">
+      <div class="ob-step-head"><span class="ob-num" id="obNum1">1</span><strong>Create the database (Supabase)</strong></div>
+      <p>At <code class="inline">supabase.com</code> → New project → SQL Editor → paste the schema → Run. Then copy your <strong>Project URL</strong> and <strong>anon public key</strong> from Settings → API.</p>
+      <button class="btn btn-soft" onclick="copySchema()">Copy schema SQL</button>
+    </div>
+
+    <div class="ob-step">
+      <div class="ob-step-head"><span class="ob-num" id="obNum2">2</span><strong>Connect this dashboard</strong></div>
+      <div class="form-row"><input id="obUrl" placeholder="https://yourproject.supabase.co" autocomplete="off"></div>
+      <div class="form-row"><input id="obKey" placeholder="anon public key (eyJ...)" autocomplete="off"></div>
+      <button class="btn btn-primary" onclick="testAndConnect()">Test &amp; connect</button>
+      <div class="ob-status" id="obStatus"></div>
+    </div>
+
+    <div class="ob-step">
+      <div class="ob-step-head"><span class="ob-num">3</span><strong>Wire up Hermes (optional, anytime)</strong></div>
+      <p>Hermes gets its own door: an MCP server with the Trust Ladder built in — it can log and draft, it can never mark an invoice sent. Copy this config into Hermes' MCP settings.</p>
+      <button class="btn btn-soft" onclick="copyMcpConfig()">Copy Hermes MCP config</button>
+    </div>
+
+    <div class="ob-footer">
+      <button class="demo-link" onclick="startDemo()">Explore in demo mode first →</button>
+      <button class="btn btn-yellow" id="enterBtn" onclick="enterApp()" disabled>Enter your Company of One</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SETTINGS ═══════════ -->
+<div class="overlay hidden" id="settingsOverlay">
+  <div class="onboard">
+    <h2>Settings &amp; connections</h2>
+    <p class="sub" id="settingsConnLine">—</p>
+    <div class="ob-step">
+      <div class="ob-step-head"><strong>Revenue floor (monthly, RM)</strong></div>
+      <p>The number the meta-hypothesis is tested against. Dashboard progress bars measure toward this.</p>
+      <div class="form-row">
+        <input id="setFloor" type="number" min="0" step="100">
+        <button class="btn btn-primary" onclick="saveFloor()">Save</button>
+      </div>
+    </div>
+    <div class="ob-step">
+      <div class="ob-step-head"><strong>API surface</strong></div>
+      <p>Every table is already a REST endpoint — future webapps talk to the same truth:<br>
+      <code class="inline">GET /rest/v1/transactions</code> · <code class="inline">POST /rest/v1/invoices</code> · <code class="inline">GET /rest/v1/time_blocks</code><br>
+      Headers: <code class="inline">apikey</code> + <code class="inline">Authorization: Bearer &lt;anon key&gt;</code></p>
+      <button class="btn btn-soft" onclick="copyMcpConfig()">Copy Hermes MCP config</button>
+    </div>
+    <div class="ob-step">
+      <div class="ob-step-head"><strong>Google Calendar import</strong></div>
+      <p>Coming in Module 2 v2 — time blocks will auto-import from your color-coded GCal. For now, log blocks here or let Hermes log them via MCP.</p>
+    </div>
+    <div class="ob-footer">
+      <button class="demo-link" onclick="disconnect()">Disconnect / reset this device</button>
+      <button class="btn btn-primary" onclick="closeSettings()">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div class="container" id="appShell" style="visibility:hidden">
+  <div class="left-panel" id="leftPanel">
+    <div id="dynamicIcon">
+      <svg class="icon-large" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+        <rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/>
+        <rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>
+      </svg>
+    </div>
+    <div class="quote-container" id="quoteContainer">
+      <blockquote id="quoteText">"Your business is a garden, not a factory. Sustainable growth requires rest, boundaries, and seasons of quiet growth beneath the soil."</blockquote>
+      <cite id="quoteAuthor">(Sustainable Solopreneur Wisdom)</cite>
+    </div>
+    <div class="conn-pill" id="connPill">connecting…</div>
+  </div>
+
+  <div class="right-panel">
+    <nav>
+      <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+      <button class="nav-btn" data-tab="soul">Soul</button>
+      <button class="nav-btn" data-tab="body">Body</button>
+      <button class="nav-btn" data-tab="heart">Heart</button>
+      <button class="nav-btn" data-tab="mind">Mind</button>
+      <div class="spacer"></div>
+      <button class="settings-link" onclick="openSettings()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+    <main>
+      <!-- DASHBOARD -->
+      <div id="dashboard" class="tab-content active">
+        <div class="dashboard-header fade-in">
+          <h1>Company of One</h1>
+          <p id="dashboard-subtitle">Tended status loading…</p>
+        </div>
+
+        <div class="stat-grid" id="dashKpis"><!-- rendered --></div>
+
+        <ul class="element-list" id="dashTiles"><!-- rendered --></ul>
+      </div>
+
+      <!-- SOUL (gentle static for MVP) -->
+      <div id="soul" class="tab-content">
+        <div class="dashboard-header"><h1>Soul (Ruh)</h1><p>Anchor your purpose before you begin.</p></div>
+        <div class="page-intro" style="border-left-color:var(--accent-green)">Today's intention is not volume, but presence. Have you connected with your Source before connecting with your clients? This space stays unmeasured on purpose — <em>rūḥ</em> is not a metric.</div>
+        <div class="checklist">
+          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Morning Dhikr / Meditation</div>
+          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Set intention for work (Niyyah)</div>
+          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Read 5 pages of beneficial knowledge</div>
+          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;font-size:.9rem"><input type="checkbox"> Silence / nature walk (10 mins)</div>
+        </div>
+      </div>
+
+      <!-- BODY = Health + MODULE 1 MONEY -->
+      <div id="body" class="tab-content">
+        <div class="dashboard-header"><h1>Body (Nafs)</h1><p>The vessel and its sustenance.</p></div>
+        <div class="sub-nav">
+          <button class="body-sub active" data-sub="sustenance" onclick="switchBodyTab('sustenance')">Sustenance (Money)</button>
+          <button class="body-sub" data-sub="invoices" onclick="switchBodyTab('invoices')">Invoices</button>
+          <button class="body-sub" data-sub="statements" onclick="switchBodyTab('statements')">Statements</button>
+          <button class="body-sub" data-sub="health" onclick="switchBodyTab('health')">Health &amp; Energy</button>
+        </div>
+
+        <!-- Sustenance: transactions -->
+        <div id="body-sustenance" class="sub-tab-content">
+          <div class="page-intro" style="border-left-color:#f59e0b">Every ringgit recorded here flows into the statements automatically. Start from zero; the documents fill as life happens.</div>
+          <div class="form-card">
+            <div class="form-title">Record a transaction</div>
+            <div class="form-row">
+              <select id="txKind"><option value="income">Income</option><option value="expense">Expense</option></select>
+              <input id="txAmount" type="number" min="0" step="0.01" placeholder="Amount (RM)">
+              <input id="txDate" type="date">
+            </div>
+            <div class="form-row">
+              <select id="txSource">
+                <option>Irori</option><option>CetaLabs</option><option>Sinar</option>
+                <option>Tutoring</option><option>Consulting</option><option>Other</option>
+              </select>
+              <input id="txNotes" placeholder="Notes (e.g. Isaac July sessions)">
+              <button class="btn btn-primary" onclick="addTransaction()">Add</button>
+            </div>
+          </div>
+          <div class="stat-grid" id="moneyKpis"></div>
+          <h3 class="section-h">Ledger — this month</h3>
+          <div id="txTableWrap"></div>
+        </div>
+
+        <!-- Invoices -->
+        <div id="body-invoices" class="sub-tab-content" style="display:none">
+          <div class="page-intro" style="border-left-color:#f59e0b">Hermes may draft invoices here via MCP. Only you can mark one <strong>sent</strong> — that click is yours alone.</div>
+          <div class="form-card">
+            <div class="form-title">Create an invoice</div>
+            <div class="form-row">
+              <input id="invClient" placeholder="Client">
+              <input id="invAmount" type="number" min="0" step="0.01" placeholder="Amount (RM)">
+              <input id="invDue" type="date" title="Due date">
+            </div>
+            <div class="form-row">
+              <input id="invDesc" placeholder="Description">
+              <button class="btn btn-primary" onclick="addInvoice()">Create draft</button>
+            </div>
+          </div>
+          <div class="stat-grid" id="invKpis"></div>
+          <div id="invTableWrap"></div>
+        </div>
+
+        <!-- Statements -->
+        <div id="body-statements" class="sub-tab-content" style="display:none">
+          <div class="page-intro" style="border-left-color:#f59e0b">Cash-basis, always current, audit-legible. When an accountant asks for more, the data is already structured to give it.</div>
+          <div id="statementsWrap"></div>
+        </div>
+
+        <!-- Health (static for MVP) -->
+        <div id="body-health" class="sub-tab-content" style="display:none">
+          <div class="page-intro" style="border-left-color:var(--accent-orange)">Honor the rights of your body. Sleep floor: midnight minimum, 5×/week. Illness = full rest, not "keep going."</div>
+          <div class="stat-grid">
+            <div class="stat-card"><div class="stat-label">Sleep floor</div><div class="stat-val">12:00 AM</div><div class="stat-sub">5 nights/week minimum</div></div>
+            <div class="stat-card"><div class="stat-label">Peak hours</div><div class="stat-val">9–12</div><div class="stat-sub">Deep work only</div></div>
+            <div class="stat-card"><div class="stat-label">Boundary</div><div class="stat-val">Fri</div><div class="stat-sub">No meetings</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HEART (gentle static for MVP) -->
+      <div id="heart" class="tab-content">
+        <div class="dashboard-header"><h1>Heart (Qalb)</h1><p>Tending to relationships and emotions.</p></div>
+        <div class="page-intro" style="border-left-color:var(--accent-rose)">The heart is the general of the body. Who needs your tenderness today? This space also stays soft — connection is witnessed here, not scored.</div>
+        <div class="checklist">
+          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Weekly Mama practice</div>
+          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Check in with R — mirror, not manager</div>
+          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Family time (phone free)</div>
+          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;font-size:.9rem"><input type="checkbox"> Self-compassion pause — kindness inward first</div>
+        </div>
+      </div>
+
+      <!-- MIND = MODULE 2 TIME -->
+      <div id="mind" class="tab-content">
+        <div class="dashboard-header"><h1>Mind (Aql)</h1><p>Time, deep work, and the Pareto guard.</p></div>
+        <div class="sub-nav">
+          <button class="mind-sub active" data-sub="time" onclick="switchMindTab('time')">Time blocks</button>
+          <button class="mind-sub" data-sub="journal" onclick="switchMindTab('journal')">Journal</button>
+          <button class="mind-sub" data-sub="review" onclick="switchMindTab('review')">Weekly review</button>
+        </div>
+
+        <!-- Time blocks -->
+        <div id="mind-time" class="sub-tab-content">
+          <div class="page-intro" style="border-left-color:var(--accent-blue)">The guard from your H1 audit, now live: Irori + AIS must be ≥ 70% of work blocks. Website work can no longer quietly eat the week.</div>
+          <div class="form-card">
+            <div class="form-title">Log a time block</div>
+            <div class="form-row">
+              <input id="tbTitle" placeholder="What did you work on?">
+              <select id="tbDomain">
+                <option>Irori</option><option>AIS</option><option>Family</option>
+                <option>Spiritual</option><option>Admin</option><option>Website</option><option>Other</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <input id="tbMinutes" type="number" min="5" step="5" placeholder="Minutes">
+              <input id="tbDate" type="date">
+              <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--text-gray)"><input type="checkbox" id="tbWork" checked style="min-width:auto;flex:none"> counts as work</label>
+              <button class="btn btn-primary" onclick="addTimeBlock()">Log</button>
+            </div>
+          </div>
+          <div id="paretoWrap"></div>
+          <h3 class="section-h">This week's blocks</h3>
+          <div id="tbTableWrap"></div>
+        </div>
+
+        <!-- Journal -->
+        <div id="mind-journal" class="sub-tab-content" style="display:none">
+          <div class="page-intro" style="border-left-color:var(--accent-blue)">Hermes can extract Yayday entries from Apple Notes and drop them here as drafts. Nothing enters your record until you approve it.</div>
+          <div class="form-card">
+            <div class="form-title">New entry</div>
+            <div class="form-row"><input id="jTitle" placeholder="Title (optional)"><input id="jDate" type="date"></div>
+            <div class="form-row"><textarea id="jContent" placeholder="What's alive today…"></textarea></div>
+            <div class="form-row"><input id="jTags" placeholder="tags, comma, separated"><button class="btn btn-primary" onclick="addJournal()">Save entry</button></div>
+          </div>
+          <div id="journalWrap"></div>
+        </div>
+
+        <!-- Weekly review -->
+        <div id="mind-review" class="sub-tab-content" style="display:none">
+          <div class="page-intro" style="border-left-color:var(--accent-blue)">The Friday anchor. Wins first — the Achiever records what it does; here it also celebrates.</div>
+          <div class="form-card">
+            <div class="form-title">This week</div>
+            <div class="form-row"><input id="wrWeek" type="date" title="Week starting (Monday)"></div>
+            <div class="form-row"><textarea id="wrWins" placeholder="Wins I'm proud of…"></textarea></div>
+            <div class="form-row"><textarea id="wrStuck" placeholder="Where I got stuck…"></textarea></div>
+            <div class="form-row">
+              <input id="wrIrori" type="number" min="0" step="0.5" placeholder="Irori hrs">
+              <input id="wrAis" type="number" min="0" step="0.5" placeholder="AIS hrs">
+              <select id="wrEnergy"><option value="">Energy 1–5</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+              <button class="btn btn-primary" onclick="saveReview()">Save review</button>
+            </div>
+          </div>
+          <div id="reviewWrap"></div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="view-toggle">
+        <button class="active" data-range="month" onclick="switchTimeframe('month')">This month</button>
+        <button data-range="quarter" onclick="switchTimeframe('quarter')">Quarter</button>
+        <button data-range="year" onclick="switchTimeframe('year')">Year</button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- Embedded schema for the copy button -->
+<script type="text/plain" id="schemaSqlBlob">-- ============================================================
+-- Tended.Today — Company of One OS
+-- Supabase schema · Module 1 (Money) + Module 2 (Time)
+-- Run this in Supabase → SQL Editor → New query → Run
+-- ============================================================
+
+-- ---------- MODULE 1 · MONEY (Compliance Layer) ----------
+
+create table if not exists categories (
+  id uuid primary key default gen_random_uuid(),
+  name text not null unique,
+  kind text not null check (kind in ('income','expense')),
+  created_at timestamptz default now()
+);
+
+insert into categories (name, kind) values
+  ('Research Income (CetaLabs / Sinar)', 'income'),
+  ('Education Income (Irori / Tutoring)', 'income'),
+  ('Consulting / Workshops', 'income'),
+  ('Other Income', 'income'),
+  ('Software & Tools', 'expense'),
+  ('Subscriptions', 'expense'),
+  ('Professional Services', 'expense'),
+  ('Zakat / Sedekah', 'expense'),
+  ('Other Expense', 'expense')
+on conflict (name) do nothing;
+
+create table if not exists transactions (
+  id uuid primary key default gen_random_uuid(),
+  tx_date date not null default current_date,
+  amount numeric(12,2) not null check (amount >= 0),
+  currency text not null default 'MYR',
+  kind text not null check (kind in ('income','expense')),
+  category text,                          -- denormalised name for simplicity
+  source text,                            -- Irori | CetaLabs | Sinar | Tutoring | ...
+  notes text,
+  created_by text not null default 'sha', -- 'sha' | 'hermes'
+  created_at timestamptz default now()
+);
+
+create table if not exists invoices (
+  id uuid primary key default gen_random_uuid(),
+  client text not null,
+  description text,
+  amount numeric(12,2) not null check (amount >= 0),
+  currency text not null default 'MYR',
+  issue_date date default current_date,
+  due_date date,
+  status text not null default 'draft'
+    check (status in ('draft','sent','paid','overdue','void')),
+  created_by text not null default 'sha',
+  created_at timestamptz default now()
+);
+
+-- ---------- MODULE 2 · TIME ----------
+
+create table if not exists time_blocks (
+  id uuid primary key default gen_random_uuid(),
+  block_date date not null default current_date,
+  title text not null,
+  domain text not null,                   -- Irori | AIS | Family | Spiritual | Admin | Website | Other
+  minutes integer not null check (minutes > 0),
+  is_work boolean not null default true,  -- counts toward Pareto denominator
+  source text not null default 'manual',  -- manual | gcal | hermes
+  created_at timestamptz default now()
+);
+
+create table if not exists journal_entries (
+  id uuid primary key default gen_random_uuid(),
+  entry_date date not null default current_date,
+  title text,
+  content text not null,
+  tags text[] default '{}',
+  source text not null default 'manual',  -- manual | hermes (from Apple Notes)
+  approved boolean not null default true, -- hermes drafts start false
+  created_at timestamptz default now()
+);
+
+create table if not exists weekly_reviews (
+  id uuid primary key default gen_random_uuid(),
+  week_start date not null unique,
+  wins text,
+  stuck text,
+  irori_hours numeric(5,1) default 0,
+  ais_hours numeric(5,1) default 0,
+  energy integer check (energy between 1 and 5),
+  created_at timestamptz default now()
+);
+
+create table if not exists plc_log (
+  id uuid primary key default gen_random_uuid(),
+  log_date date not null default current_date,
+  kind text not null check (kind in ('quran','highlight','other')),
+  detail text not null,
+  created_at timestamptz default now()
+);
+
+-- ---------- SECURITY (single-user, anon key) ----------
+-- MVP: RLS enabled with permissive policies for the anon role.
+-- Your anon key is the password to this data — do not publish the
+-- deployed page URL together with the key. Harden later with
+-- Supabase Auth (email magic link) when ready.
+
+alter table categories      enable row level security;
+alter table transactions    enable row level security;
+alter table invoices        enable row level security;
+alter table time_blocks     enable row level security;
+alter table journal_entries enable row level security;
+alter table weekly_reviews  enable row level security;
+alter table plc_log         enable row level security;
+
+do $$
+declare t text;
+begin
+  foreach t in array array['categories','transactions','invoices','time_blocks','journal_entries','weekly_reviews','plc_log']
+  loop
+    execute format('drop policy if exists "anon full access" on %I', t);
+    execute format('create policy "anon full access" on %I for all using (true) with check (true)', t);
+  end loop;
+end $$;
+</script>
+
+<script>
+/* ═══════════ STATE & STORAGE ═══════════ */
+const mem = {};
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return mem[k] ?? null; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e){ mem[k]=v; } },
+  del(k){ try { localStorage.removeItem(k); } catch(e){ delete mem[k]; } }
+};
+
+const state = {
+  mode: null,          // 'live' | 'demo'
+  sb: null,
+  range: 'month',
+  floor: Number(store.get('tt_floor') || 10000),
+  cache: { transactions:[], invoices:[], time_blocks:[], journal_entries:[], weekly_reviews:[] }
+};
+
+const RM = n => 'RM ' + Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
+const todayISO = () => new Date().toISOString().slice(0,10);
+const uid = () => 'x' + Math.random().toString(36).slice(2,10);
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function weekStart(d){ const x=new Date(d); const day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); return x.toISOString().slice(0,10); }
+
+/* ═══════════ DATA LAYER ═══════════ */
+const TABLES = {
+  transactions:'tx_date', invoices:'issue_date', time_blocks:'block_date',
+  journal_entries:'entry_date', weekly_reviews:'week_start'
+};
+
+const db = {
+  async list(table){
+    if (state.mode==='demo') return state.cache[table];
+    const { data, error } = await state.sb.from(table).select('*').order(TABLES[table],{ascending:false}).limit(500);
+    if (error){ toast('Load failed: '+error.message); return state.cache[table]; }
+    state.cache[table] = data; return data;
+  },
+  async insert(table,row){
+    if (state.mode==='demo'){ row.id=uid(); row.created_at=new Date().toISOString(); state.cache[table].unshift(row); return row; }
+    const { data, error } = await state.sb.from(table).insert(row).select().single();
+    if (error){ toast('Save failed: '+error.message); return null; }
+    state.cache[table].unshift(data); return data;
+  },
+  async update(table,id,patch){
+    if (state.mode==='demo'){
+      const r = state.cache[table].find(x=>x.id===id); if(r) Object.assign(r,patch); return r;
+    }
+    const { data, error } = await state.sb.from(table).update(patch).eq('id',id).select().single();
+    if (error){ toast('Update failed: '+error.message); return null; }
+    const i = state.cache[table].findIndex(x=>x.id===id); if(i>-1) state.cache[table][i]=data;
+    return data;
+  },
+  async upsertReview(row){
+    if (state.mode==='demo'){
+      const i = state.cache.weekly_reviews.findIndex(r=>r.week_start===row.week_start);
+      if(i>-1) Object.assign(state.cache.weekly_reviews[i],row); else { row.id=uid(); state.cache.weekly_reviews.unshift(row); }
+      return row;
+    }
+    const { data, error } = await state.sb.from('weekly_reviews').upsert(row,{onConflict:'week_start'}).select().single();
+    if (error){ toast('Save failed: '+error.message); return null; }
+    return data;
+  }
+};
+
+async function refreshAll(){
+  await Promise.all(Object.keys(TABLES).map(t=>db.list(t)));
+  renderAll();
+}
+
+/* ═══════════ RANGE HELPERS ═══════════ */
+function rangeBounds(){
+  const now = new Date(); const y=now.getFullYear(), m=now.getMonth();
+  if (state.range==='month')   return { from:new Date(y,m,1),  label:'This month' };
+  if (state.range==='quarter') return { from:new Date(y,m-2,1),label:'This quarter' };
+  return { from:new Date(y,0,1), label: y+' YTD' };
+}
+function inRange(dateStr){
+  const {from} = rangeBounds();
+  return new Date(dateStr) >= from;
+}
+
+/* ═══════════ RENDER: MONEY ═══════════ */
+function moneyNumbers(){
+  const tx = state.cache.transactions.filter(t=>inRange(t.tx_date));
+  const income  = tx.filter(t=>t.kind==='income').reduce((s,t)=>s+Number(t.amount),0);
+  const expense = tx.filter(t=>t.kind==='expense').reduce((s,t)=>s+Number(t.amount),0);
+  const inv = state.cache.invoices;
+  const pending = inv.filter(i=>['draft','sent','overdue'].includes(i.status));
+  const invoicedThisRange = inv.filter(i=>i.status!=='void' && inRange(i.issue_date)).reduce((s,i)=>s+Number(i.amount),0);
+  return { income, expense, net: income-expense,
+    pendingCount: pending.length,
+    pendingTotal: pending.reduce((s,i)=>s+Number(i.amount),0),
+    overdue: inv.filter(i=>i.status==='overdue').length,
+    drafts: inv.filter(i=>i.status==='draft').length,
+    invoicedThisRange };
+}
+
+function renderMoney(){
+  const n = moneyNumbers();
+  const pct = state.floor ? Math.min(100, Math.round(n.income/state.floor*100)) : 0;
+  document.getElementById('moneyKpis').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Income · ${rangeBounds().label}</div>
+      <div class="stat-val metric-good">${RM(n.income)}</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${pct>=100?'#15803d':'#86efac'}"></div></div>
+      <div class="stat-sub">${pct}% of RM ${state.floor.toLocaleString()} floor</div></div>
+    <div class="stat-card"><div class="stat-label">Expenses</div><div class="stat-val">${RM(n.expense)}</div></div>
+    <div class="stat-card"><div class="stat-label">Net</div><div class="stat-val ${n.net>=0?'metric-good':'metric-warning'}">${RM(n.net)}</div></div>`;
+
+  const rows = state.cache.transactions.filter(t=>inRange(t.tx_date));
+  document.getElementById('txTableWrap').innerHTML = rows.length ? `
+    <table class="data-table"><thead><tr><th>Date</th><th>Kind</th><th>Source</th><th>Notes</th><th class="num">Amount</th><th>By</th></tr></thead><tbody>
+    ${rows.map(t=>`<tr>
+      <td>${esc(t.tx_date)}</td>
+      <td><span class="tag tag-${t.kind}">${t.kind}</span></td>
+      <td>${esc(t.source||'—')}</td>
+      <td>${esc(t.notes||'')}</td>
+      <td class="num">${t.kind==='expense'?'−':''}${RM(t.amount)}</td>
+      <td>${t.created_by==='hermes'?'<span class="tag tag-hermes">Hermes</span>':''}</td>
+    </tr>`).join('')}</tbody></table>`
+    : `<p class="empty-note">The ledger starts at zero — a clean page. Record your first transaction above, or tell Hermes and it appears here.</p>`;
+}
+
+function renderInvoices(){
+  const n = moneyNumbers();
+  document.getElementById('invKpis').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Pending pipeline</div><div class="stat-val">${RM(n.pendingTotal)}</div><div class="stat-sub">${n.pendingCount} invoice(s)</div></div>
+    <div class="stat-card"><div class="stat-label">Invoiced · ${rangeBounds().label}</div><div class="stat-val metric-good">${RM(n.invoicedThisRange)}</div></div>
+    <div class="stat-card"><div class="stat-label">Overdue</div><div class="stat-val ${n.overdue?'metric-warning':''}">${n.overdue}</div></div>`;
+
+  const inv = state.cache.invoices;
+  const actions = i => {
+    if (i.status==='draft')  return `<button class="btn-tiny" onclick="setInvoice('${i.id}','sent')">Mark sent</button> <button class="btn-tiny" onclick="setInvoice('${i.id}','void')">Void</button>`;
+    if (i.status==='sent')   return `<button class="btn-tiny" onclick="setInvoice('${i.id}','paid')">Mark paid</button> <button class="btn-tiny" onclick="setInvoice('${i.id}','overdue')">Overdue</button>`;
+    if (i.status==='overdue')return `<button class="btn-tiny" onclick="setInvoice('${i.id}','paid')">Mark paid</button>`;
+    return '';
+  };
+  document.getElementById('invTableWrap').innerHTML = inv.length ? `
+    <table class="data-table"><thead><tr><th>Client</th><th>Description</th><th class="num">Amount</th><th>Due</th><th>Status</th><th></th></tr></thead><tbody>
+    ${inv.map(i=>`<tr>
+      <td><strong>${esc(i.client)}</strong>${i.created_by==='hermes'?' <span class="tag tag-hermes">Hermes draft</span>':''}</td>
+      <td>${esc(i.description||'')}</td>
+      <td class="num">${RM(i.amount)}</td>
+      <td>${esc(i.due_date||'—')}</td>
+      <td><span class="tag tag-${i.status}">${i.status}</span></td>
+      <td>${actions(i)}</td>
+    </tr>`).join('')}</tbody></table>`
+    : `<p class="empty-note">No invoices yet. Create the first draft above — the dashboard alert wakes up the moment one exists.</p>`;
+}
+
+function renderStatements(){
+  const all = state.cache.transactions;
+  const {label} = rangeBounds();
+  const inR = all.filter(t=>inRange(t.tx_date));
+  const bySrc = kind => {
+    const map = {};
+    inR.filter(t=>t.kind===kind).forEach(t=>{ const k=t.source||'Other'; map[k]=(map[k]||0)+Number(t.amount); });
+    return Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  };
+  const incomeRows = bySrc('income'), expenseRows = bySrc('expense');
+  const income = incomeRows.reduce((s,[,v])=>s+v,0), expense = expenseRows.reduce((s,[,v])=>s+v,0);
+  const cashAllTime = all.reduce((s,t)=>s+(t.kind==='income'?1:-1)*Number(t.amount),0);
+  const receivable = state.cache.invoices.filter(i=>['sent','overdue'].includes(i.status)).reduce((s,i)=>s+Number(i.amount),0);
+  const line = ([k,v]) => `<tr><td style="padding-left:1.2rem">${esc(k)}</td><td class="num">${RM(v)}</td></tr>`;
+
+  document.getElementById('statementsWrap').innerHTML = `
+    <h3 class="section-h">Profit &amp; Loss — ${label} (cash basis)</h3>
+    <table class="data-table"><tbody>
+      <tr><td><strong>Income</strong></td><td class="num"></td></tr>
+      ${incomeRows.length?incomeRows.map(line).join(''):'<tr><td style="padding-left:1.2rem;color:#999">No income recorded yet</td><td class="num">RM 0.00</td></tr>'}
+      <tr><td><strong>Total income</strong></td><td class="num"><strong>${RM(income)}</strong></td></tr>
+      <tr><td><strong>Expenses</strong></td><td class="num"></td></tr>
+      ${expenseRows.length?expenseRows.map(line).join(''):'<tr><td style="padding-left:1.2rem;color:#999">No expenses recorded yet</td><td class="num">RM 0.00</td></tr>'}
+      <tr><td><strong>Total expenses</strong></td><td class="num"><strong>${RM(expense)}</strong></td></tr>
+      <tr><td style="font-family:'Lora',serif"><strong>Net profit</strong></td><td class="num"><strong class="${income-expense>=0?'metric-good':'metric-warning'}">${RM(income-expense)}</strong></td></tr>
+    </tbody></table>
+
+    <h3 class="section-h">Balance sheet — as of ${todayISO()}</h3>
+    <table class="data-table"><tbody>
+      <tr><td><strong>Assets</strong></td><td class="num"></td></tr>
+      <tr><td style="padding-left:1.2rem">Cash (cumulative net of all transactions)</td><td class="num">${RM(cashAllTime)}</td></tr>
+      <tr><td style="padding-left:1.2rem">Accounts receivable (sent + overdue invoices)</td><td class="num">${RM(receivable)}</td></tr>
+      <tr><td><strong>Total assets</strong></td><td class="num"><strong>${RM(cashAllTime+receivable)}</strong></td></tr>
+      <tr><td><strong>Liabilities</strong></td><td class="num">RM 0.00</td></tr>
+      <tr><td style="font-family:'Lora',serif"><strong>Owner's equity</strong></td><td class="num"><strong>${RM(cashAllTime+receivable)}</strong></td></tr>
+    </tbody></table>
+    <p style="font-size:.75rem;color:var(--text-light);line-height:1.5">Cash-basis MVP. Liabilities and asset classes can be added as tables when needed — the structure is already audit-legible: every line above traces to a dated, sourced row.</p>`;
+}
+
+/* ═══════════ RENDER: TIME ═══════════ */
+function paretoNumbers(){
+  const ws = weekStart(new Date());
+  const blocks = state.cache.time_blocks.filter(b=>b.block_date>=ws && b.is_work);
+  const total = blocks.reduce((s,b)=>s+Number(b.minutes),0);
+  const core  = blocks.filter(b=>['Irori','AIS'].includes(b.domain)).reduce((s,b)=>s+Number(b.minutes),0);
+  return { ws, total, core, pct: total?Math.round(core/total*100):0 };
+}
+
+function renderTime(){
+  const p = paretoNumbers();
+  const color = p.total===0 ? '#ddd' : p.pct>=70 ? '#15803d' : p.pct>=50 ? '#ca8a04' : '#c2410c';
+  document.getElementById('paretoWrap').innerHTML = `
+    <div class="stat-card" style="margin-bottom:1rem">
+      <div class="stat-label">Pareto guard — week of ${p.ws}</div>
+      <div class="stat-val" style="color:${color}">${p.total? p.pct+'%' : '—'}</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${p.pct}%;background:${color}"></div></div>
+      <div class="stat-sub">${p.total ? `Irori + AIS: ${(p.core/60).toFixed(1)}h of ${(p.total/60).toFixed(1)}h work · target ≥ 70%` : 'No work blocks logged this week yet'}</div>
+    </div>`;
+
+  const ws = weekStart(new Date());
+  const rows = state.cache.time_blocks.filter(b=>b.block_date>=ws);
+  document.getElementById('tbTableWrap').innerHTML = rows.length ? `
+    <table class="data-table"><thead><tr><th>Date</th><th>Block</th><th>Domain</th><th class="num">Minutes</th><th>Source</th></tr></thead><tbody>
+    ${rows.map(b=>`<tr>
+      <td>${esc(b.block_date)}</td><td>${esc(b.title)}</td><td>${esc(b.domain)}</td>
+      <td class="num">${b.minutes}</td>
+      <td>${b.source==='hermes'?'<span class="tag tag-hermes">Hermes</span>':esc(b.source)}</td>
+    </tr>`).join('')}</tbody></table>`
+    : `<p class="empty-note">No blocks this week. Log one above, or Hermes can log them from your day's telling.</p>`;
+}
+
+function renderJournal(){
+  const entries = state.cache.journal_entries;
+  document.getElementById('journalWrap').innerHTML = entries.length ? entries.map(e=>`
+    <div class="journal-card ${!e.approved?'pending':''}">
+      <div class="journal-meta">
+        <strong>${esc(e.title||e.entry_date)}</strong> · ${esc(e.entry_date)}
+        ${e.source==='hermes'?'<span class="tag tag-hermes">Hermes draft</span>':''}
+        ${(e.tags||[]).map(t=>`<span class="tag" style="background:#f4f1ea;color:#6b6355">${esc(t)}</span>`).join(' ')}
+        ${!e.approved?`<button class="btn-tiny btn-yellow" onclick="approveJournal('${e.id}')">Approve</button>`:''}
+      </div>
+      <div class="journal-body">${esc(e.content)}</div>
+    </div>`).join('')
+    : `<p class="empty-note">Yayday lives in Apple Notes; this is where the durable, structured record accumulates — one entry at a time.</p>`;
+}
+
+function renderReviews(){
+  const rev = state.cache.weekly_reviews;
+  document.getElementById('reviewWrap').innerHTML = rev.length ? rev.map(r=>`
+    <div class="journal-card">
+      <div class="journal-meta"><strong>Week of ${esc(r.week_start)}</strong>
+        · Irori ${r.irori_hours||0}h · AIS ${r.ais_hours||0}h ${r.energy?('· energy '+r.energy+'/5'):''}</div>
+      ${r.wins?`<div class="journal-body"><strong>Wins:</strong> ${esc(r.wins)}</div>`:''}
+      ${r.stuck?`<div class="journal-body" style="margin-top:.4rem"><strong>Stuck:</strong> ${esc(r.stuck)}</div>`:''}
+    </div>`).join('')
+    : `<p class="empty-note">First weekly review pending. Friday is waiting.</p>`;
+}
+
+/* ═══════════ RENDER: DASHBOARD ═══════════ */
+function renderDashboard(){
+  const n = moneyNumbers();
+  const p = paretoNumbers();
+  const j = state.cache.journal_entries[0];
+  const pendingApproval = state.cache.journal_entries.filter(e=>!e.approved).length;
+  const {label} = rangeBounds();
+
+  const status = n.income>=state.floor ? ['Thriving','#15803d'] : n.income>0 ? ['Growing','#ca8a04'] : ['Seeding','#6b7280'];
+  document.getElementById('dashboard-subtitle').innerHTML =
+    `Tended status: <span style="color:${status[1]};font-weight:600">${status[0]}</span> (${label})`;
+
+  const floorPct = state.floor ? Math.min(100,Math.round(n.income/state.floor*100)) : 0;
+  document.getElementById('dashKpis').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Revenue · ${label}</div>
+      <div class="stat-val metric-good">${RM(n.income)}</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${floorPct}%;background:#86efac"></div></div>
+      <div class="stat-sub">${floorPct}% of floor</div></div>
+    <div class="stat-card"><div class="stat-label">Invoices to send / chase</div>
+      <div class="stat-val ${n.pendingCount?'metric-warning':''}">${n.pendingCount}</div>
+      <div class="stat-sub">${RM(n.pendingTotal)} in pipeline${n.overdue?` · ${n.overdue} overdue`:''}</div></div>
+    <div class="stat-card"><div class="stat-label">Pareto guard (week)</div>
+      <div class="stat-val" style="color:${p.total===0?'#9ca3af':p.pct>=70?'#15803d':'#c2410c'}">${p.total?p.pct+'%':'—'}</div>
+      <div class="stat-sub">Irori + AIS of work time</div></div>`;
+
+  document.getElementById('dashTiles').innerHTML = `
+    <li class="element-item" onclick="goTo('soul')">
+      <span class="element-icon">✨</span>
+      <div class="element-content"><div class="element-title">Soul (Ruh)</div>
+      <div class="element-details"><span class="detail-item">Unmeasured, by design</span><span class="detail-item">Niyyah before numbers</span></div></div>
+    </li>
+    <li class="element-item" onclick="goTo('body')">
+      <span class="element-icon">🌍</span>
+      <div class="element-content"><div class="element-title">Body (Nafs) — Sustenance</div>
+      <div class="element-details">
+        <span class="detail-item">Net ${label.toLowerCase()}: <span class="${n.net>=0?'metric-good':'metric-warning'}">${RM(n.net)}</span></span>
+        <span class="detail-item">Drafts awaiting your send: <span class="metric-neutral">${n.drafts}</span></span>
+      </div></div>
+    </li>
+    <li class="element-item" onclick="goTo('heart')">
+      <span class="element-icon">❤️</span>
+      <div class="element-content"><div class="element-title">Heart (Qalb)</div>
+      <div class="element-details"><span class="detail-item">Witnessed, not scored</span><span class="detail-item">Mama practice · R · family</span></div></div>
+    </li>
+    <li class="element-item" onclick="goTo('mind')">
+      <span class="element-icon">💡</span>
+      <div class="element-content"><div class="element-title">Mind (Aql) — Time</div>
+      <div class="element-details">
+        <span class="detail-item">Work this week: <span class="metric-neutral">${(p.total/60).toFixed(1)}h</span></span>
+        <span class="detail-item">Latest entry: ${j?esc((j.title||j.entry_date)):'—'}</span>
+        ${pendingApproval?`<span class="detail-item"><span class="metric-warning">${pendingApproval} Hermes draft(s) to approve</span></span>`:''}
+      </div></div>
+    </li>`;
+}
+
+function renderAll(){
+  renderDashboard(); renderMoney(); renderInvoices(); renderStatements();
+  renderTime(); renderJournal(); renderReviews();
+}
+
+/* ═══════════ ACTIONS ═══════════ */
+async function addTransaction(){
+  const amount = parseFloat(document.getElementById('txAmount').value);
+  if (!amount || amount<=0) return toast('Amount needed');
+  await db.insert('transactions',{
+    tx_date: document.getElementById('txDate').value || todayISO(),
+    amount, kind: document.getElementById('txKind').value,
+    source: document.getElementById('txSource').value,
+    notes: document.getElementById('txNotes').value || null,
+    created_by:'sha'
+  });
+  document.getElementById('txAmount').value=''; document.getElementById('txNotes').value='';
+  renderAll(); toast('Recorded');
+}
+
+async function addInvoice(){
+  const client = document.getElementById('invClient').value.trim();
+  const amount = parseFloat(document.getElementById('invAmount').value);
+  if (!client || !amount) return toast('Client + amount needed');
+  await db.insert('invoices',{
+    client, amount, description: document.getElementById('invDesc').value || null,
+    issue_date: todayISO(), due_date: document.getElementById('invDue').value || null,
+    status:'draft', created_by:'sha'
+  });
+  ['invClient','invAmount','invDesc','invDue'].forEach(id=>document.getElementById(id).value='');
+  renderAll(); toast('Draft created');
+}
+
+async function setInvoice(id,status){
+  await db.update('invoices',id,{status});
+  renderAll(); toast('Invoice '+status);
+}
+
+async function addTimeBlock(){
+  const title = document.getElementById('tbTitle').value.trim();
+  const minutes = parseInt(document.getElementById('tbMinutes').value);
+  if (!title || !minutes) return toast('Title + minutes needed');
+  await db.insert('time_blocks',{
+    title, minutes, domain: document.getElementById('tbDomain').value,
+    block_date: document.getElementById('tbDate').value || todayISO(),
+    is_work: document.getElementById('tbWork').checked, source:'manual'
+  });
+  document.getElementById('tbTitle').value=''; document.getElementById('tbMinutes').value='';
+  renderAll(); toast('Block logged');
+}
+
+async function addJournal(){
+  const content = document.getElementById('jContent').value.trim();
+  if (!content) return toast('Write something first');
+  await db.insert('journal_entries',{
+    content, title: document.getElementById('jTitle').value || null,
+    entry_date: document.getElementById('jDate').value || todayISO(),
+    tags: document.getElementById('jTags').value.split(',').map(s=>s.trim()).filter(Boolean),
+    source:'manual', approved:true
+  });
+  document.getElementById('jContent').value=''; document.getElementById('jTitle').value=''; document.getElementById('jTags').value='';
+  renderAll(); toast('Entry saved');
+}
+
+async function approveJournal(id){
+  await db.update('journal_entries',id,{approved:true});
+  renderAll(); toast('Approved — it enters the record');
+}
+
+async function saveReview(){
+  const wk = document.getElementById('wrWeek').value;
+  if (!wk) return toast('Pick the week start');
+  await db.upsertReview({
+    week_start: weekStart(wk),
+    wins: document.getElementById('wrWins').value || null,
+    stuck: document.getElementById('wrStuck').value || null,
+    irori_hours: parseFloat(document.getElementById('wrIrori').value)||0,
+    ais_hours: parseFloat(document.getElementById('wrAis').value)||0,
+    energy: parseInt(document.getElementById('wrEnergy').value)||null
+  });
+  await db.list('weekly_reviews'); renderAll(); toast('Review saved');
+}
+
+/* ═══════════ NAV & UI ═══════════ */
+const sectionData = {
+  dashboard:{quote:'"Your business is a garden, not a factory. Sustainable growth requires rest, boundaries, and seasons of quiet growth beneath the soil."',author:'(Sustainable Solopreneur Wisdom)',icon:'<rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>',cls:''},
+  soul:{quote:'"He who knows himself knows his Lord. The deeper the roots go into the unseen, the higher the branches reach into the sky."',author:'(Al-Ghazali / Sufi Wisdom)',icon:'<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>',cls:'soul-mode'},
+  heart:{quote:'"Do not force the rose to open. The sun and the rain will do that work. Your job is only to keep the soil soft."',author:'(Reflections on Tending)',icon:'<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',cls:'heart-mode'},
+  mind:{quote:'"Clarity comes from stillness, not speed. A muddy pond clears only when you stop stirring it."',author:'(Mindful Strategy)',icon:'<path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/><path d="M9 21h6"/>',cls:'mind-mode'},
+  body:{quote:'"The vessel has rights over you. Sustenance recorded with adab becomes amanah, not anxiety."',author:'(The Rights of the Self)',icon:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',cls:'body-mode'}
+};
+
+function goTo(tab){ switchTab(tab); }
+function switchTab(tabName){
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tabName));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active',c.id===tabName));
+  const d = sectionData[tabName], lp=document.getElementById('leftPanel');
+  lp.classList.remove('soul-mode','heart-mode','mind-mode','body-mode');
+  if (d.cls) lp.classList.add(d.cls);
+  const qc = document.getElementById('quoteContainer');
+  qc.classList.remove('quote-anim'); void qc.offsetWidth;
+  setTimeout(()=>{
+    document.getElementById('quoteText').textContent = d.quote.replace(/^"|"$/g,'"');
+    document.getElementById('quoteText').textContent = d.quote;
+    document.getElementById('quoteAuthor').textContent = d.author;
+    document.getElementById('dynamicIcon').innerHTML = `<svg class="icon-large" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">${d.icon}</svg>`;
+    qc.classList.add('quote-anim');
+  },100);
+}
+document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+
+function switchBodyTab(name){
+  document.querySelectorAll('.body-sub').forEach(b=>b.classList.toggle('active',b.dataset.sub===name));
+  ['sustenance','invoices','statements','health'].forEach(s=>{
+    document.getElementById('body-'+s).style.display = s===name?'block':'none';
+  });
+}
+function switchMindTab(name){
+  document.querySelectorAll('.mind-sub').forEach(b=>b.classList.toggle('active',b.dataset.sub===name));
+  ['time','journal','review'].forEach(s=>{
+    document.getElementById('mind-'+s).style.display = s===name?'block':'none';
+  });
+}
+function switchTimeframe(range){
+  state.range = range;
+  document.querySelectorAll('[data-range]').forEach(b=>b.classList.toggle('active',b.dataset.range===range));
+  renderAll();
+}
+
+/* ═══════════ ONBOARDING / SETTINGS ═══════════ */
+function copySchema(){
+  navigator.clipboard.writeText(document.getElementById('schemaSqlBlob').textContent.trim())
+    .then(()=>toast('Schema copied — paste in Supabase SQL Editor'))
+    .catch(()=>toast('Copy blocked — see schema.sql in the project folder'));
+  document.getElementById('obNum1').classList.add('done'); document.getElementById('obNum1').textContent='✓';
+}
+
+function copyMcpConfig(){
+  const url = store.get('tt_url') || document.getElementById('obUrl')?.value || 'https://YOURPROJECT.supabase.co';
+  const cfg = JSON.stringify({ mcpServers:{ "tended-today":{
+    command:"node", args:["/path/to/hermes-mcp/server.mjs"],
+    env:{ SUPABASE_URL:url, SUPABASE_SERVICE_KEY:"<service_role key — server-side only>" }
+  }}},null,2);
+  navigator.clipboard.writeText(cfg).then(()=>toast('MCP config copied for Hermes')).catch(()=>toast('Copy blocked'));
+}
+
+async function testAndConnect(){
+  const url = document.getElementById('obUrl').value.trim();
+  const key = document.getElementById('obKey').value.trim();
+  const st = document.getElementById('obStatus');
+  if (!url || !key){ st.textContent='Both fields needed.'; st.className='ob-status err'; return; }
+  st.textContent='Testing…'; st.className='ob-status';
+  try {
+    const sb = window.supabase.createClient(url,key);
+    const { error } = await sb.from('transactions').select('id').limit(1);
+    if (error) throw error;
+    state.sb = sb; state.mode='live';
+    store.set('tt_url',url); store.set('tt_key',key);
+    st.textContent='Connected. The schema is in place — masyaAllah, you\'re live.'; st.className='ob-status ok';
+    document.getElementById('obNum2').classList.add('done'); document.getElementById('obNum2').textContent='✓';
+    document.getElementById('enterBtn').disabled=false;
+  } catch(e){
+    st.textContent='Could not connect: '+(e.message||e)+'. Check the URL, key, and that schema.sql has been run.';
+    st.className='ob-status err';
+  }
+}
+
+function seedDemo(){
+  const t=todayISO();
+  state.cache.transactions=[
+    {id:uid(),tx_date:t,amount:1200,kind:'income',source:'Tutoring',notes:'Sample — Isaac July sessions',created_by:'sha'},
+    {id:uid(),tx_date:t,amount:89,kind:'expense',source:'Other',notes:'Sample — Supabase-adjacent tooling',created_by:'sha'}
+  ];
+  state.cache.invoices=[
+    {id:uid(),client:'Sample Client Sdn Bhd',description:'AI safety workshop',amount:2500,issue_date:t,due_date:t,status:'draft',created_by:'hermes'}
+  ];
+  state.cache.time_blocks=[
+    {id:uid(),block_date:t,title:'Sample — Irori worksheet sprint',domain:'Irori',minutes:120,is_work:true,source:'manual'},
+    {id:uid(),block_date:t,title:'Sample — website maintenance',domain:'Website',minutes:60,is_work:true,source:'manual'}
+  ];
+  state.cache.journal_entries=[
+    {id:uid(),entry_date:t,title:'Sample Hermes draft',content:'Extracted from Yayday: worksheet #3 shipped, energy steady, luteal-phase pacing respected.',tags:['yayday'],source:'hermes',approved:false}
+  ];
+}
+
+function startDemo(){
+  state.mode='demo'; seedDemo(); enterApp(true);
+  toast('Demo mode — nothing is saved. Reload to reset.');
+}
+
+function enterApp(demo){
+  document.getElementById('onboardOverlay').classList.add('hidden');
+  document.getElementById('appShell').style.visibility='visible';
+  const pill = document.getElementById('connPill');
+  if (state.mode==='live'){ pill.textContent='● live · supabase'; pill.className='conn-pill live'; }
+  else { pill.textContent='● demo · in-memory'; pill.className='conn-pill demo'; }
+  if (state.mode==='live') refreshAll(); else renderAll();
+}
+
+function openSettings(){
+  document.getElementById('setFloor').value = state.floor;
+  document.getElementById('settingsConnLine').textContent =
+    state.mode==='live' ? 'Connected live to '+(store.get('tt_url')||'Supabase') : 'Demo mode — data is not persisted.';
+  document.getElementById('settingsOverlay').classList.remove('hidden');
+}
+function closeSettings(){ document.getElementById('settingsOverlay').classList.add('hidden'); }
+function saveFloor(){
+  const v = Number(document.getElementById('setFloor').value)||0;
+  state.floor=v; store.set('tt_floor',String(v));
+  renderAll(); toast('Revenue floor updated'); 
+}
+function disconnect(){
+  store.del('tt_url'); store.del('tt_key');
+  location.reload();
+}
+
+/* ═══════════ BOOT ═══════════ */
+(async function boot(){
+  document.getElementById('txDate').value = todayISO();
+  document.getElementById('tbDate').value = todayISO();
+  document.getElementById('jDate').value = todayISO();
+  document.getElementById('wrWeek').value = weekStart(new Date());
+
+  const url = store.get('tt_url'), key = store.get('tt_key');
+  if (url && key && window.supabase){
+    try {
+      const sb = window.supabase.createClient(url,key);
+      const { error } = await sb.from('transactions').select('id').limit(1);
+      if (!error){ state.sb=sb; state.mode='live'; enterApp(); return; }
+    } catch(e){ /* fall through to onboarding */ }
+  }
+  // show onboarding
+  document.getElementById('onboardOverlay').classList.remove('hidden');
+})();
+</script>
+</body>
+</html>
