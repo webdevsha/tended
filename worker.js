@@ -1,6 +1,95 @@
 // --- CHIP-IN PUBLIC KEY (For Webhook Verification) ---
 const CHIP_PUBLIC_KEY = `<API Key>`; // Replace with your actual Chip-in public key
 
+// --- THIRTYTHREE WELCOME EMAIL TEMPLATE ---
+// Source of truth mirrored in emails/thirtythree-welcome.html for easy preview/editing.
+// Edit that file in a browser, then paste the <body>...</body> contents back in here.
+const THIRTYTHREE_WELCOME_TEMPLATE = `
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body style="font-family:'Inter',Helvetica,Arial,sans-serif;background:#fdfcf9;margin:0;padding:40px 20px;color:#1a1814;">
+  <div style="max-width:580px;margin:0 auto;">
+
+    <!-- wordmark -->
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:400;color:#1a1814;letter-spacing:0.02em;margin:0 0 48px;">
+      Thirty<span style="color:#b0a390;">Three</span>
+    </p>
+
+    <!-- hadith -->
+    <blockquote style="border-left:2px solid #b0a390;padding-left:24px;margin:0 0 8px;">
+      <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:300;font-style:italic;line-height:1.55;color:#1a1814;margin:0;">
+        "The people of Paradise will enter at the age of thirty-three."
+      </p>
+    </blockquote>
+    <p style="font-size:11px;color:#8a857d;letter-spacing:0.06em;margin:0 0 40px 26px;">— Tirmidhi, Hadith 2545</p>
+
+    <!-- greeting -->
+    <p style="font-size:15px;line-height:1.75;color:#1a1814;margin:0 0 20px;">
+      Assalamu alaykum {{USER_NAME}},
+    </p>
+    <p style="font-size:15px;line-height:1.75;color:#4a4640;margin:0 0 20px;">
+      You are in. Welcome to the reading.
+    </p>
+    <p style="font-size:15px;line-height:1.75;color:#4a4640;margin:0 0 20px;">
+      ThirtyThree is a newsletter for Muslim professionals asking a specific question:
+      if thirty-three is the age of eternal flourishing — who are you becoming to get there?
+    </p>
+
+    <!-- what to expect box -->
+    <div style="background:#f7f4ee;border-radius:6px;padding:28px 28px 20px;margin:0 0 32px;">
+      <p style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#b0a390;font-weight:500;margin:0 0 16px;">What arrives in your inbox</p>
+      <table style="border-collapse:collapse;width:100%;">
+        <tr>
+          <td style="padding:10px 0;border-bottom:1px solid #ddd7cc;vertical-align:top;">
+            <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7c5e;font-weight:500;">Weekly letter</span><br>
+            <span style="font-size:13px;color:#4a4640;line-height:1.6;">One reflection on character, career, or the long game. Grounded in Islamic scholarship. Readable in 5 minutes.</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:10px 0;border-bottom:1px solid #ddd7cc;vertical-align:top;">
+            <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7c5e;font-weight:500;">Reading notes</span><br>
+            <span style="font-size:13px;color:#4a4640;line-height:1.6;">What we are currently sitting with — Al-Ghazālī, Abdal-Hakim Murad, Ibn ʿArabī, and the occasional secular thinker in conversation with them.</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:10px 0;vertical-align:top;">
+            <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7c5e;font-weight:500;">No noise</span><br>
+            <span style="font-size:13px;color:#4a4640;line-height:1.6;">Once a week. No product pitches. No hustle mantras. The slow kind.</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- first reflection teaser -->
+    <p style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#b0a390;font-weight:500;margin:0 0 12px;">In the meantime — one question to sit with</p>
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;font-weight:300;font-style:italic;line-height:1.6;color:#1a1814;border-left:2px solid #ddd7cc;padding-left:20px;margin:0 0 32px;">
+      Al-Ghazālī defines good character as "a firmly established condition of the soul, from which actions proceed easily, without thinking."
+      What condition is your soul currently establishing — through the choices you make when no one is watching?
+    </p>
+
+    <!-- sign off -->
+    <p style="font-size:15px;line-height:1.75;color:#4a4640;margin:0 0 8px;">
+      The first letter arrives next week.
+    </p>
+    <p style="font-size:15px;line-height:1.75;color:#1a1814;margin:0 0 40px;">
+      — Sha<br>
+      <span style="font-size:12px;color:#8a857d;">ThirtyThree</span>
+    </p>
+
+    <!-- footer -->
+    <hr style="border:none;border-top:1px solid #ddd7cc;margin:0 0 20px;">
+    <p style="font-size:11px;color:#b0a390;line-height:1.6;margin:0;">
+      You subscribed at dev.tended.pages.dev/thirty-three ·
+      <a href="{{unsubscribe}}" style="color:#b0a390;">Unsubscribe</a>
+    </p>
+
+  </div>
+</body>
+</html>`;
+
 // Helper: Verify Chip-in Webhook Signature using Web Crypto API
 async function verifyChipSignature(signatureBase64, rawBodyBuffer) {
     try {
@@ -64,92 +153,7 @@ async function sendBrevoEmailInternal(payload, env) {
         fromEmail = "hai@shafiranoh.com";
         fromName  = "ThirtyThree";
         finalSubject = "Welcome to ThirtyThree";
-
-        emailHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-        </head>
-        <body style="font-family:'Inter',Helvetica,Arial,sans-serif;background:#fdfcf9;margin:0;padding:40px 20px;color:#1a1814;">
-          <div style="max-width:580px;margin:0 auto;">
-
-            <!-- wordmark -->
-            <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:400;color:#1a1814;letter-spacing:0.02em;margin:0 0 48px;">
-              Thirty<span style="color:#b0a390;">Three</span>
-            </p>
-
-            <!-- hadith -->
-            <blockquote style="border-left:2px solid #b0a390;padding-left:24px;margin:0 0 8px;">
-              <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:300;font-style:italic;line-height:1.55;color:#1a1814;margin:0;">
-                "The people of Paradise will enter at the age of thirty-three."
-              </p>
-            </blockquote>
-            <p style="font-size:11px;color:#8a857d;letter-spacing:0.06em;margin:0 0 40px 26px;">— Tirmidhi, Hadith 2545</p>
-
-            <!-- greeting -->
-            <p style="font-size:15px;line-height:1.75;color:#1a1814;margin:0 0 20px;">
-              Assalamu alaykum ${user_name},
-            </p>
-            <p style="font-size:15px;line-height:1.75;color:#4a4640;margin:0 0 20px;">
-              You are in. Welcome to the reading.
-            </p>
-            <p style="font-size:15px;line-height:1.75;color:#4a4640;margin:0 0 20px;">
-              ThirtyThree is a newsletter for Muslim professionals asking a specific question:
-              if thirty-three is the age of eternal flourishing — who are you becoming to get there?
-            </p>
-
-            <!-- what to expect box -->
-            <div style="background:#f7f4ee;border-radius:6px;padding:28px 28px 20px;margin:0 0 32px;">
-              <p style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#b0a390;font-weight:500;margin:0 0 16px;">What arrives in your inbox</p>
-              <table style="border-collapse:collapse;width:100%;">
-                <tr>
-                  <td style="padding:10px 0;border-bottom:1px solid #ddd7cc;vertical-align:top;">
-                    <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7c5e;font-weight:500;">Weekly letter</span><br>
-                    <span style="font-size:13px;color:#4a4640;line-height:1.6;">One reflection on character, career, or the long game. Grounded in Islamic scholarship. Readable in 5 minutes.</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding:10px 0;border-bottom:1px solid #ddd7cc;vertical-align:top;">
-                    <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7c5e;font-weight:500;">Reading notes</span><br>
-                    <span style="font-size:13px;color:#4a4640;line-height:1.6;">What we are currently sitting with — Al-Ghazālī, Abdal-Hakim Murad, Ibn ʿArabī, and the occasional secular thinker in conversation with them.</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding:10px 0;vertical-align:top;">
-                    <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7c5e;font-weight:500;">No noise</span><br>
-                    <span style="font-size:13px;color:#4a4640;line-height:1.6;">Once a week. No product pitches. No hustle mantras. The slow kind.</span>
-                  </td>
-                </tr>
-              </table>
-            </div>
-
-            <!-- first reflection teaser -->
-            <p style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#b0a390;font-weight:500;margin:0 0 12px;">In the meantime — one question to sit with</p>
-            <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;font-weight:300;font-style:italic;line-height:1.6;color:#1a1814;border-left:2px solid #ddd7cc;padding-left:20px;margin:0 0 32px;">
-              Al-Ghazālī defines good character as "a firmly established condition of the soul, from which actions proceed easily, without thinking."
-              What condition is your soul currently establishing — through the choices you make when no one is watching?
-            </p>
-
-            <!-- sign off -->
-            <p style="font-size:15px;line-height:1.75;color:#4a4640;margin:0 0 8px;">
-              The first letter arrives next week.
-            </p>
-            <p style="font-size:15px;line-height:1.75;color:#1a1814;margin:0 0 40px;">
-              — Sha<br>
-              <span style="font-size:12px;color:#8a857d;">ThirtyThree</span>
-            </p>
-
-            <!-- footer -->
-            <hr style="border:none;border-top:1px solid #ddd7cc;margin:0 0 20px;">
-            <p style="font-size:11px;color:#b0a390;line-height:1.6;margin:0;">
-              You subscribed at thirtythree.shafiranoh.com ·
-              <a href="{{unsubscribe}}" style="color:#b0a390;">Unsubscribe</a>
-            </p>
-
-          </div>
-        </body>
-        </html>`;
+        emailHtml = THIRTYTHREE_WELCOME_TEMPLATE.replace(/{{USER_NAME}}/g, user_name);
     }
     else if (isReflection) {
         fromEmail = sender_email || "hai@shafiranoh.com";

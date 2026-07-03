@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ThirtyThree — OG Thumbnails</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #e8e4dc;
+  font-family: 'Inter', system-ui, sans-serif;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* helper label */
+.label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8a857d;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+/* ── SHARED CARD BASE ── */
+.card {
+  width: 1200px;
+  height: 630px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* ════════════════════════════════
+   VARIANT A — Hadith + wordmark
+   Cream field, large italic quote,
+   muted red rule, green dot-grid
+════════════════════════════════ */
+.card-a {
+  background: #f7f4ee;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+}
+
+.card-a .left {
+  padding: 72px 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.card-a .wordmark {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: #1a1814;
+}
+.card-a .wordmark span { color: #b0a390; }
+
+.card-a blockquote {
+  border-left: 2px solid #8c4a3a;
+  padding-left: 32px;
+  margin: 0;
+}
+.card-a blockquote p {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 36px;
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.42;
+  color: #1a1814;
+  margin-bottom: 16px;
+}
+.card-a blockquote cite {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: #8a857d;
+  font-style: normal;
+  text-transform: uppercase;
+}
+
+.card-a .tagline {
+  font-size: 13px;
+  color: #4a4640;
+  line-height: 1.65;
+  max-width: 440px;
+}
+
+.card-a .right {
+  background: #f0ece3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 40px;
+  gap: 32px;
+}
+
+/* dot grid */
+.dot-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  width: 220px;
+}
+.dot-grid span {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: #c8bfb0;
+  flex-shrink: 0;
+}
+.dot-grid span.d-used     { background: #8c4a3a; }
+.dot-grid span.d-now      { background: #7c6e5a; box-shadow: 0 0 0 2px #f0ece3, 0 0 0 3px #7c6e5a; }
+.dot-grid span.d-eternity { background: #dce6d5; border: 1px solid #a3b396; }
+
+.card-a .right-label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8a857d;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.7;
+}
+.card-a .right-num {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 96px;
+  font-weight: 300;
+  color: #6b7c5e;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* ════════════════════════════════
+   VARIANT B — Big 33 centred
+   Warm cream, massive number,
+   green/red band accents, quiet type
+════════════════════════════════ */
+.card-b {
+  background: #fdfcf9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 72px;
+}
+.card-b .top-rule {
+  width: 48px; height: 2px;
+  background: #8c4a3a;
+  margin-bottom: 32px;
+}
+.card-b .big-num {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 220px;
+  font-weight: 300;
+  color: #f0ece3;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  position: relative;
+  z-index: 0;
+  user-select: none;
+}
+.card-b .overlay {
+  margin-top: -96px;
+  position: relative;
+  z-index: 1;
+}
+.card-b .overlay-word {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 52px;
+  font-weight: 400;
+  color: #1a1814;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.card-b .overlay-word span { color: #6b7c5e; }
+.card-b .sub {
+  margin-top: 20px;
+  font-size: 15px;
+  color: #8a857d;
+  line-height: 1.65;
+  max-width: 560px;
+}
+.card-b .bottom-line {
+  margin-top: 36px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.card-b .bottom-rule-g { width: 32px; height: 1px; background: #6b7c5e; }
+.card-b .bottom-rule-r { width: 32px; height: 1px; background: #8c4a3a; }
+.card-b .bottom-text {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b0a390;
+  font-weight: 500;
+}
+
+/* ════════════════════════════════
+   VARIANT C — Split columns
+   Left: question. Right: scholar
+   grid + red/green accents
+════════════════════════════════ */
+.card-c {
+  background: #f7f4ee;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.card-c .col {
+  padding: 64px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.card-c .col-right {
+  background: #f0ece3;
+  border-left: 1px solid #ddd7cc;
+}
+
+.card-c .wordmark {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 16px;
+  color: #1a1814;
+  letter-spacing: 0.04em;
+}
+.card-c .wordmark span { color: #b0a390; }
+
+.card-c .question {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 38px;
+  font-weight: 300;
+  line-height: 1.3;
+  color: #1a1814;
+}
+.card-c .question em { font-style: italic; color: #6b7c5e; }
+
+.card-c .bottom-tag {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8c4a3a;
+  font-weight: 500;
+}
+
+/* scholar quotes on right */
+.card-c .scholar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+  margin-top: 8px;
+}
+.card-c .sq {
+  padding: 20px 0;
+  border-bottom: 1px solid #ddd7cc;
+}
+.card-c .sq:last-child { border-bottom: none; }
+.card-c .sq-quote {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 300;
+  color: #1a1814;
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+.card-c .sq-name {
+  font-size: 10px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #6b7c5e;
+  font-weight: 500;
+}
+
+.card-c .right-bottom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card-c .pip {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+.card-c .pip-r { background: #8c4a3a; }
+.card-c .pip-g { background: #6b7c5e; }
+.card-c .right-bottom-text {
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #b0a390;
+  font-weight: 500;
+}
+
+/* ════════════════════════════════
+   VARIANT D — Life arc bar
+   Minimal, typographic, cream
+   with a full-width lifespan bar
+════════════════════════════════ */
+.card-d {
+  background: #fdfcf9;
+  padding: 72px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.card-d .top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.card-d .wordmark {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 18px;
+  color: #1a1814;
+  letter-spacing: 0.04em;
+}
+.card-d .wordmark span { color: #b0a390; }
+.card-d .tag {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8a857d;
+  font-weight: 500;
+  text-align: right;
+  line-height: 1.6;
+}
+
+.card-d .middle {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px 0 32px;
+}
+.card-d .headline {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 58px;
+  font-weight: 300;
+  line-height: 1.18;
+  color: #1a1814;
+  margin-bottom: 20px;
+}
+.card-d .headline em { font-style: italic; color: #6b7c5e; }
+.card-d .headline strong {
+  font-weight: 400;
+  color: #8c4a3a;
+  font-style: normal;
+}
+.card-d .sub {
+  font-size: 14px;
+  color: #8a857d;
+  line-height: 1.65;
+  max-width: 680px;
+}
+
+/* life arc bar */
+.card-d .arc-wrap { display: flex; flex-direction: column; gap: 10px; }
+.card-d .arc-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #b0a390;
+  font-weight: 500;
+}
+.card-d .arc-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: #e8e0d4;
+  display: flex;
+  overflow: hidden;
+}
+.card-d .arc-seg { height: 100%; }
+.arc-birth    { background: #c8bfb0; width: 23.8%; } /* 0-15 / 63 */
+.arc-form     { background: #6b7c5e; width: 28.6%; } /* 15-33 / 63 */
+.arc-now      { background: #7c6e5a; width: 2%;    } /* marker */
+.arc-ashud    { background: #a3b396; width: 11.1%; } /* 33-40 / 63 */
+.arc-legacy   { background: #c8bfb0; width: 36.5%; }/* 40-63 / 63 */
+.arc-infinity { background: #dce6d5; width: 8%;    border: none; flex-shrink: 0; border-right: 1px solid #a3b396; }
+
+.card-d .arc-anno {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.card-d .anno-item {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; color: #8a857d;
+}
+.card-d .anno-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<!-- ── VARIANT A ── -->
+<div>
+  <p class="label">Variant A — Hadith quote + dot grid</p>
+  <div class="card card-a">
+    <div class="left">
+      <div class="wordmark">Thirty<span>Three</span></div>
+
+      <blockquote>
+        <p>"The people of Paradise will enter at the age of thirty-three."</p>
+        <cite>— Tirmidhi, Hadith 2545</cite>
+      </blockquote>
+
+      <p class="tagline">
+        A newsletter for Muslim professionals building a life worth keeping.<br>
+        Weekly reflections on character, career, and the long game.
+      </p>
+    </div>
+    <div class="right">
+      <div class="right-num">33</div>
+      <div id="dots-a" class="dot-grid"></div>
+      <p class="right-label">63 years · one dot each<br>the people of Paradise are<br>thirty-three, forever</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── VARIANT B ── -->
+<div>
+  <p class="label">Variant B — Big number, minimal</p>
+  <div class="card card-b">
+    <div class="top-rule"></div>
+    <div class="big-num" aria-hidden="true">33</div>
+    <div class="overlay">
+      <div class="overlay-word">Thirty<span>Three</span></div>
+      <p class="sub">A newsletter for Muslim professionals asking one question:<br>who are you becoming — and is it worth keeping?</p>
+      <div class="bottom-line">
+        <div class="bottom-rule-r"></div>
+        <span class="bottom-text">Character · Career · The long game</span>
+        <div class="bottom-rule-g"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── VARIANT C ── -->
+<div>
+  <p class="label">Variant C — Split: question left / scholars right</p>
+  <div class="card card-c">
+    <div class="col">
+      <div class="wordmark">Thirty<span>Three</span></div>
+      <div class="question">
+        If thirty-three is the age<br>of <em>eternal flourishing</em> —<br>who are you becoming<br>to get there?
+      </div>
+      <div class="bottom-tag">Newsletter for Muslim professionals</div>
+    </div>
+    <div class="col col-right">
+      <div class="wordmark" style="color:#8a857d;font-size:13px;">What the tradition says</div>
+      <div class="scholar-list">
+        <div class="sq">
+          <p class="sq-quote">"A trait of character is a firmly established condition of the soul, from which actions proceed easily without forethought."</p>
+          <span class="sq-name">Al-Ghazālī — Iḥyāʾ, Book XXII</span>
+        </div>
+        <div class="sq">
+          <p class="sq-quote">"Activism will only succeed when it remembers that history is in good hands."</p>
+          <span class="sq-name">Abdal-Hakim Murad — Contentions</span>
+        </div>
+        <div class="sq">
+          <p class="sq-quote">"Whosoever is granted wisdom has truly been granted abundant good."</p>
+          <span class="sq-name">Quran 2:269</span>
+        </div>
+      </div>
+      <div class="right-bottom">
+        <span class="pip pip-r"></span>
+        <span class="pip pip-g"></span>
+        <span class="right-bottom-text">Character · Career · The long game</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── VARIANT D ── -->
+<div>
+  <p class="label">Variant D — Life arc bar, typographic</p>
+  <div class="card card-d">
+    <div class="top">
+      <div class="wordmark">Thirty<span>Three</span></div>
+      <div class="tag">A newsletter on<br>purposeful becoming</div>
+    </div>
+
+    <div class="middle">
+      <h2 class="headline">
+        Most of us are already<br>
+        halfway through the<br>
+        Prophet's <em>ﷺ</em> lifespan.<br>
+        <strong>What are you building with the rest?</strong>
+      </h2>
+      <p class="sub">Weekly reflections on character, career, and the long game — for Muslim professionals who want more than productivity advice: living for the day we become 33 in the Hereafter everyday.</p>
+    </div>
+
+    <div class="arc-wrap">
+      <div class="arc-labels">
+        <span>Birth</span>
+        <span style="color:#6b7c5e;font-weight:500;">Formation (15–33)</span>
+        <span style="color:#7c6e5a;">↑ You</span>
+        <span>Ashuddahu</span>
+        <span>Legacy</span>
+        <span style="color:#6b7c5e;">∞</span>
+      </div>
+      <div class="arc-bar">
+        <div class="arc-seg arc-birth"></div>
+        <div class="arc-seg arc-form"></div>
+        <div class="arc-seg arc-now"></div>
+        <div class="arc-seg arc-ashud"></div>
+        <div class="arc-seg arc-legacy"></div>
+        <div class="arc-seg arc-infinity"></div>
+      </div>
+      <div class="arc-anno">
+        <div class="anno-item"><span class="anno-dot" style="background:#6b7c5e;"></span>Formation years (15–33)</div>
+        <div class="anno-item"><span class="anno-dot" style="background:#8c4a3a;"></span>Peak burnout: age 25 (2026 data)</div>
+        <div class="anno-item"><span class="anno-dot" style="background:#dce6d5;border:1px solid #a3b396;"></span>Eternity at 33</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// build dot grid for variant A
+(function(){
+  const el = document.getElementById('dots-a');
+  const LIFE = 63, ETERNITY = 10, YOU = 30;
+  for (let i = 1; i <= LIFE; i++) {
+    const s = document.createElement('span');
+    s.className = i < YOU ? 'd-used' : i === YOU ? 'd-now' : '';
+    el.appendChild(s);
+  }
+  for (let i = 0; i < ETERNITY; i++) {
+    const s = document.createElement('span');
+    s.className = 'd-eternity';
+    el.appendChild(s);
+  }
+})();
+</script>
+</body>
+</html>
