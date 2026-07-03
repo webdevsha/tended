@@ -49,8 +49,13 @@ create table if not exists invoices (
   status text not null default 'draft'
     check (status in ('draft','sent','paid','overdue','void')),
   created_by text not null default 'sha',
-  created_at timestamptz default now()
+  created_at timestamptz default now(),
+  line_items jsonb not null default '[]'::jsonb
+  -- each item: {date, description, hours, rate, amount} — e.g. one row per class taught
 );
+
+-- Migration for existing projects created before line_items existed:
+-- alter table invoices add column if not exists line_items jsonb not null default '[]'::jsonb;
 
 -- ---------- MODULE 2 · TIME ----------
 

@@ -354,11 +354,20 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
             <div class="form-title">Create an invoice</div>
             <div class="form-row">
               <input id="invClient" placeholder="Client">
-              <input id="invAmount" type="number" min="0" step="0.01" placeholder="Amount (RM)">
               <input id="invDue" type="date" title="Due date">
             </div>
+
+            <div class="form-title" style="margin-top:.75rem">Add each class / session as its own line</div>
             <div class="form-row">
-              <input id="invDesc" placeholder="Description">
+              <input id="liDate" type="date" title="Class date">
+              <input id="liDesc" placeholder="Description (e.g. Class 4 — Algebra)">
+              <input id="liHours" type="number" min="0" step="0.25" placeholder="Hours">
+              <input id="liRate" type="number" min="0" step="0.01" placeholder="Rate (RM/hr)">
+              <button class="btn btn-soft" onclick="addInvoiceLine()">+ Add line</button>
+            </div>
+            <div id="invLinesWrap"></div>
+
+            <div class="form-row" style="margin-top:.75rem">
               <button class="btn btn-primary" onclick="addInvoice()">Create draft</button>
             </div>
           </div>
@@ -522,8 +531,11 @@ create table if not exists invoices (
   status text not null default 'draft'
     check (status in ('draft','sent','paid','overdue','void')),
   created_by text not null default 'sha',
-  created_at timestamptz default now()
+  created_at timestamptz default now(),
+  line_items jsonb not null default '[]'::jsonb
 );
+
+-- Existing projects: alter table invoices add column if not exists line_items jsonb not null default '[]'::jsonb;
 
 -- ---------- MODULE 2 · TIME ----------
 
@@ -760,7 +772,7 @@ function renderInvoices(){
       <td class="num">${RM(i.amount)}</td>
       <td>${esc(i.due_date||'—')}</td>
       <td><span class="tag tag-${i.status}">${i.status}</span></td>
-      <td>${actions(i)}</td>
+      <td><button class="btn-tiny" onclick="viewInvoice('${i.id}')">View / PDF</button> ${actions(i)}</td>
     </tr>`).join('')}</tbody></table>`
     : `<p class="empty-note">No invoices yet. Create the first draft above — the dashboard alert wakes up the moment one exists.</p>`;
 }
@@ -946,17 +958,91 @@ async function addTransaction(){
   renderAll(); toast('Recorded');
 }
 
+state.invDraftLines = [];
+
+function addInvoiceLine(){
+  const date = document.getElementById('liDate').value || todayISO();
+  const description = document.getElementById('liDesc').value.trim();
+  const hours = parseFloat(document.getElementById('liHours').value);
+  const rate = parseFloat(document.getElementById('liRate').value);
+  if (!description || !hours || !rate) return toast('Description, hours + rate needed');
+  state.invDraftLines.push({ date, description, hours, rate, amount: Math.round(hours*rate*100)/100 });
+  ['liDesc','liHours','liRate'].forEach(id=>document.getElementById(id).value='');
+  renderInvoiceLines();
+}
+
+function removeInvoiceLine(idx){
+  state.invDraftLines.splice(idx,1);
+  renderInvoiceLines();
+}
+
+function renderInvoiceLines(){
+  const lines = state.invDraftLines;
+  const total = lines.reduce((s,l)=>s+l.amount,0);
+  document.getElementById('invLinesWrap').innerHTML = lines.length ? `
+    <table class="data-table"><thead><tr><th>Date</th><th>Description</th><th class="num">Hours</th><th class="num">Rate</th><th class="num">Amount</th><th></th></tr></thead><tbody>
+    ${lines.map((l,idx)=>`<tr>
+      <td>${esc(l.date)}</td><td>${esc(l.description)}</td>
+      <td class="num">${l.hours}</td><td class="num">${RM(l.rate)}</td><td class="num">${RM(l.amount)}</td>
+      <td><button class="btn-tiny" onclick="removeInvoiceLine(${idx})">Remove</button></td>
+    </tr>`).join('')}
+    <tr><td colspan="4"><strong>Total</strong></td><td class="num"><strong>${RM(total)}</strong></td><td></td></tr>
+    </tbody></table>`
+    : `<p class="empty-note">No lines added yet — add each class above, then create the invoice.</p>`;
+}
+
 async function addInvoice(){
   const client = document.getElementById('invClient').value.trim();
-  const amount = parseFloat(document.getElementById('invAmount').value);
-  if (!client || !amount) return toast('Client + amount needed');
+  const lines = state.invDraftLines;
+  if (!client) return toast('Client needed');
+  if (!lines.length) return toast('Add at least one class/session line');
+  const amount = Math.round(lines.reduce((s,l)=>s+l.amount,0)*100)/100;
+  const description = lines.length===1 ? lines[0].description : `${lines.length} classes (${lines.reduce((s,l)=>s+l.hours,0)}h total)`;
   await db.insert('invoices',{
-    client, amount, description: document.getElementById('invDesc').value || null,
+    client, amount, description,
     issue_date: todayISO(), due_date: document.getElementById('invDue').value || null,
-    status:'draft', created_by:'sha'
+    status:'draft', created_by:'sha', line_items: lines
   });
-  ['invClient','invAmount','invDesc','invDue'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('invClient').value=''; document.getElementById('invDue').value='';
+  state.invDraftLines = []; renderInvoiceLines();
   renderAll(); toast('Draft created');
+}
+
+function invoiceNumber(i){
+  const d = (i.issue_date||i.created_at||'').replace(/-/g,'').slice(0,8);
+  return 'INV-'+(d||'0000')+'-'+String(i.id).replace(/-/g,'').slice(0,4).toUpperCase();
+}
+
+async function viewInvoice(id){
+  const i = state.cache.invoices.find(x=>x.id===id);
+  if (!i) return toast('Invoice not found');
+  let tpl;
+  try {
+    tpl = await (await fetch('invoice-template.html')).text();
+  } catch(e) {
+    return toast('Could not load invoice-template.html — serve this app over http(s), not file://');
+  }
+  const statusClass = i.status==='paid' ? 'paid' : (i.status==='overdue'||i.status==='void') ? 'overdue' : '';
+  const lines = (i.line_items && i.line_items.length) ? i.line_items
+    : [{ date: i.issue_date, description: i.description||'Services rendered', hours:'—', rate:'—', amount: i.amount }];
+  const rows = lines.map(l=>`<tr>
+      <td>${esc(l.date||'—')}</td>
+      <td><div class="item-desc">${esc(l.description)}</div></td>
+      <td class="num">${l.hours==='—'?'—':Number(l.hours)}</td>
+      <td class="num">${l.rate==='—'?'—':RM(l.rate)}</td>
+      <td class="num">${RM(l.amount)}</td>
+    </tr>`).join('');
+  const html = tpl
+    .replaceAll('{{INVOICE_NUMBER}}', invoiceNumber(i))
+    .replaceAll('{{STATUS}}', esc(i.status))
+    .replaceAll('{{STATUS_CLASS}}', statusClass)
+    .replaceAll('{{CLIENT_NAME}}', esc(i.client))
+    .replaceAll('{{ISSUE_DATE}}', esc(i.issue_date||'—'))
+    .replaceAll('{{DUE_DATE}}', esc(i.due_date||'—'))
+    .replaceAll('{{LINE_ITEMS_ROWS}}', rows)
+    .replaceAll('{{AMOUNT}}', RM(i.amount));
+  const blob = new Blob([html], {type:'text/html'});
+  window.open(URL.createObjectURL(blob), '_blank');
 }
 
 async function setInvoice(id,status){
@@ -1100,7 +1186,8 @@ function seedDemo(){
     {id:uid(),tx_date:t,amount:89,kind:'expense',source:'Other',notes:'Sample — Supabase-adjacent tooling',created_by:'sha'}
   ];
   state.cache.invoices=[
-    {id:uid(),client:'Sample Client Sdn Bhd',description:'AI safety workshop',amount:2500,issue_date:t,due_date:t,status:'draft',created_by:'hermes'}
+    {id:uid(),client:'Sample Client Sdn Bhd',description:'2 classes (4h total)',amount:400,issue_date:t,due_date:t,status:'draft',created_by:'hermes',
+      line_items:[{date:t,description:'Class 1 — Algebra',hours:2,rate:100,amount:200},{date:t,description:'Class 2 — Algebra',hours:2,rate:100,amount:200}]}
   ];
   state.cache.time_blocks=[
     {id:uid(),block_date:t,title:'Sample — Irori worksheet sprint',domain:'Irori',minutes:120,is_work:true,source:'manual'},
@@ -1147,7 +1234,9 @@ function disconnect(){
   document.getElementById('txDate').value = todayISO();
   document.getElementById('tbDate').value = todayISO();
   document.getElementById('jDate').value = todayISO();
+  document.getElementById('liDate').value = todayISO();
   document.getElementById('wrWeek').value = weekStart(new Date());
+  renderInvoiceLines();
 
   const url = store.get('tt_url'), key = store.get('tt_key');
   if (url && key && window.supabase){
