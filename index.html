@@ -132,7 +132,20 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent-yellow);b
 .journal-card{border:1px solid var(--border-light);border-radius:8px;padding:.9rem 1rem;margin-bottom:.7rem;background:#fff}
 .journal-card.pending{background:#faf7ff;border-color:#ddd6fe}
 .journal-meta{font-size:.72rem;color:var(--text-light);margin-bottom:.35rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
-.journal-body{font-size:.85rem;color:var(--text-dark);line-height:1.55;white-space:pre-wrap}
+.journal-body{font-size:.85rem;color:var(--text-dark);line-height:1.55}
+.journal-body p{margin:0 0 .5rem}
+.journal-body p:last-child{margin-bottom:0}
+.journal-body h1,.journal-body h2,.journal-body h3{margin:.6rem 0 .35rem;line-height:1.3}
+.journal-body h1{font-size:1.05rem}
+.journal-body h2{font-size:.95rem}
+.journal-body h3{font-size:.88rem}
+.journal-body ul{margin:.2rem 0 .5rem 1.1rem;padding:0}
+.journal-body li{margin-bottom:.2rem}
+.journal-card summary.journal-meta{cursor:pointer;list-style:none}
+.journal-card summary.journal-meta::-webkit-details-marker{display:none}
+.journal-card summary.journal-meta::before{content:'▸';display:inline-block;margin-right:.35rem;color:var(--text-light);transition:transform .15s}
+.journal-card details[open] summary.journal-meta::before{transform:rotate(90deg)}
+.journal-card details>.journal-body{margin-top:.5rem}
 
 /* Onboarding overlay */
 .overlay{position:fixed;inset:0;background:rgba(30,28,24,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem}
@@ -594,6 +607,7 @@ const state = {
   sb: null,
   range: 'month',
   floor: Number(store.get('tt_floor') || 10000),
+  journalVisibleCount: 3,
   cache: { transactions:[], invoices:[], time_blocks:[], journal_entries:[], weekly_reviews:[] }
 };
 
@@ -602,6 +616,28 @@ const todayISO = () => new Date().toISOString().slice(0,10);
 const uid = () => 'x' + Math.random().toString(36).slice(2,10);
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
 function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function mdToHtml(s){
+  const lines = esc(s??'').split(/\r?\n/);
+  let html = '', inList = false;
+  const inline = t => t
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/(?<![_a-zA-Z0-9])_(.+?)_(?![_a-zA-Z0-9])/g,'<em>$1</em>')
+    .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g,'<em>$1</em>');
+  const closeList = () => { if(inList){ html+='</ul>'; inList=false; } };
+  for(const raw of lines){
+    const line = raw.trim();
+    if(!line){ closeList(); continue; }
+    let m;
+    if((m=line.match(/^###\s+(.*)/))){ closeList(); html+=`<h3>${inline(m[1])}</h3>`; }
+    else if((m=line.match(/^##\s+(.*)/))){ closeList(); html+=`<h2>${inline(m[1])}</h2>`; }
+    else if((m=line.match(/^#\s+(.*)/))){ closeList(); html+=`<h1>${inline(m[1])}</h1>`; }
+    else if((m=line.match(/^[-*]\s+(.*)/))){ if(!inList){ html+='<ul>'; inList=true; } html+=`<li>${inline(m[1])}</li>`; }
+    else { closeList(); html+=`<p>${inline(line)}</p>`; }
+  }
+  closeList();
+  return html;
+}
 function weekStart(d){ const x=new Date(d); const day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); return x.toISOString().slice(0,10); }
 
 /* ═══════════ DATA LAYER ═══════════ */
@@ -802,17 +838,25 @@ function renderTime(){
 
 function renderJournal(){
   const entries = state.cache.journal_entries;
-  document.getElementById('journalWrap').innerHTML = entries.length ? entries.map(e=>`
+  const visible = entries.slice(0, state.journalVisibleCount);
+  document.getElementById('journalWrap').innerHTML = entries.length ? visible.map((e,i)=>`
     <div class="journal-card ${!e.approved?'pending':''}">
-      <div class="journal-meta">
-        <strong>${esc(e.title||e.entry_date)}</strong> · ${esc(e.entry_date)}
-        ${e.source==='hermes'?'<span class="tag tag-hermes">Hermes draft</span>':''}
-        ${(e.tags||[]).map(t=>`<span class="tag" style="background:#f4f1ea;color:#6b6355">${esc(t)}</span>`).join(' ')}
-        ${!e.approved?`<button class="btn-tiny btn-yellow" onclick="approveJournal('${e.id}')">Approve</button>`:''}
-      </div>
-      <div class="journal-body">${esc(e.content)}</div>
-    </div>`).join('')
+      <details ${i<3?'open':''}>
+        <summary class="journal-meta">
+          <strong>${esc(e.title||e.entry_date)}</strong> · ${esc(e.entry_date)}
+          ${e.source==='hermes'?'<span class="tag tag-hermes">Hermes draft</span>':''}
+          ${(e.tags||[]).map(t=>`<span class="tag" style="background:#f4f1ea;color:#6b6355">${esc(t)}</span>`).join(' ')}
+          ${!e.approved?`<button class="btn-tiny btn-yellow" onclick="event.preventDefault();event.stopPropagation();approveJournal('${e.id}')">Approve</button>`:''}
+        </summary>
+        <div class="journal-body">${mdToHtml(e.content)}</div>
+      </details>
+    </div>`).join('') + (entries.length>visible.length?`<button class="btn btn-soft" onclick="loadMoreJournal()">Load more (${entries.length-visible.length} more)</button>`:'')
     : `<p class="empty-note">Yayday lives in Apple Notes; this is where the durable, structured record accumulates — one entry at a time.</p>`;
+}
+
+function loadMoreJournal(){
+  state.journalVisibleCount += 10;
+  renderJournal();
 }
 
 function renderReviews(){
@@ -821,8 +865,8 @@ function renderReviews(){
     <div class="journal-card">
       <div class="journal-meta"><strong>Week of ${esc(r.week_start)}</strong>
         · Irori ${r.irori_hours||0}h · AIS ${r.ais_hours||0}h ${r.energy?('· energy '+r.energy+'/5'):''}</div>
-      ${r.wins?`<div class="journal-body"><strong>Wins:</strong> ${esc(r.wins)}</div>`:''}
-      ${r.stuck?`<div class="journal-body" style="margin-top:.4rem"><strong>Stuck:</strong> ${esc(r.stuck)}</div>`:''}
+      ${r.wins?`<div class="journal-body"><strong>Wins:</strong> ${mdToHtml(r.wins)}</div>`:''}
+      ${r.stuck?`<div class="journal-body" style="margin-top:.4rem"><strong>Stuck:</strong> ${mdToHtml(r.stuck)}</div>`:''}
     </div>`).join('')
     : `<p class="empty-note">First weekly review pending. Friday is waiting.</p>`;
 }
