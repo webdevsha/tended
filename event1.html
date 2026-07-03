@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fusion Conversations — Session 01 · ThirtyThree</title>
+<meta name="description" content="A monthly peer conversation on tafakkur, technology, and civilizational thinking. Session 01 with Firdaus & Sha — mid-July 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+:root {
+  --ink:         #1a1814;
+  --ink-mid:     #4a4640;
+  --ink-mute:    #8a857d;
+  --parchment:   #f7f4ee;
+  --warm-white:  #fdfcf9;
+  --cream-deep:  #f0ece3;
+  --accent:      #7c6e5a;
+  --accent-mute: #b0a390;
+  --border:      #ddd7cc;
+  --green:       #6b7c5e;
+  --green-light: #dce6d5;
+  --green-mute:  #a3b396;
+  --red:         #8c4a3a;
+  --red-light:   #f0dbd6;
+  --red-mute:    #c49080;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans:  'Inter', system-ui, sans-serif;
+}
+
+body {
+  background: var(--warm-white);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 48px;
+  border-bottom: 1px solid var(--border);
+  background: var(--warm-white);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-logo { font-family: var(--serif); font-size: 18px; font-weight: 400; color: var(--ink); text-decoration: none; letter-spacing: 0.02em; }
+.nav-logo span { color: var(--accent-mute); }
+.nav-series { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-mute); font-weight: 500; }
+
+/* ── HERO ── */
+.hero {
+  background: var(--parchment);
+  padding: 96px 48px 80px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-inner { max-width: 900px; margin: 0 auto; }
+
+/* ghost number */
+.hero-ghost {
+  position: absolute;
+  right: -20px;
+  top: -40px;
+  font-family: var(--serif);
+  font-size: 420px;
+  font-weight: 300;
+  color: #e8e0d4;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  user-select: none;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-content { position: relative; z-index: 1; }
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-mute);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 6px;
+}
+.series-name {
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--red);
+  letter-spacing: 0.06em;
+  margin-bottom: 32px;
+  display: block;
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(36px, 5.5vw, 64px);
+  font-weight: 300;
+  line-height: 1.15;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.hero-title em { font-style: italic; color: var(--green); }
+
+.hero-subtitle {
+  font-family: var(--serif);
+  font-size: clamp(18px, 2.5vw, 26px);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--ink-mute);
+  margin-bottom: 48px;
+  line-height: 1.4;
+}
+
+/* date + meta strip */
+.meta-strip {
+  display: flex;
+  gap: 0;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 48px;
+}
+.meta-cell {
+  padding: 18px 32px 18px 0;
+  margin-right: 32px;
+  border-right: 1px solid var(--border);
+}
+.meta-cell:last-child { border-right: none; margin-right: 0; }
+.meta-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-mute); font-weight: 500; margin-bottom: 4px; }
+.meta-value { font-family: var(--serif); font-size: 18px; font-weight: 400; color: var(--ink); line-height: 1.3; }
+.meta-value.coming { color: var(--red); font-style: italic; }
+
+/* CTA */
+.btn-cta {
+  display: inline-block;
+  padding: 14px 36px;
+  background: var(--accent);
+  color: var(--parchment);
+  font-size: 12px;
+  font-family: var(--sans);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 3px;
+  border: none;
+  cursor: default;
+  opacity: 0.72;
+  position: relative;
+}
+.btn-cta-wrap { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.btn-soon {
+  font-size: 11px;
+  color: var(--accent-mute);
+  letter-spacing: 0.08em;
+  font-style: italic;
+}
+
+/* ── LAYOUT ── */
+.container { max-width: 900px; margin: 0 auto; padding: 80px 48px; }
+hr.div { border: none; border-top: 1px solid var(--border); margin: 0 48px; }
+
+/* ── WHAT THIS IS ── */
+.what-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin-top: 40px;
+}
+.what-cell {
+  background: var(--parchment);
+  padding: 32px 28px;
+}
+.what-cell.accent-r { border-top: 2px solid var(--red-mute); }
+.what-cell.accent-g { border-top: 2px solid var(--green-mute); }
+.what-icon {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 12px;
+  display: block;
+}
+.what-icon.r { color: var(--red); }
+.what-icon.g { color: var(--green); }
+.what-head {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.what-body { font-size: 13px; color: var(--ink-mute); line-height: 1.7; }
+
+/* ── SESSION FORMAT ── */
+.format-section { background: var(--parchment); padding: 80px 48px; }
+.format-inner { max-width: 900px; margin: 0 auto; }
+.format-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 32px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+}
+.format-row:first-of-type { border-top: 1px solid var(--border); margin-top: 40px; }
+.format-time {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--accent-mute);
+  padding-top: 2px;
+}
+.format-seg-name {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.format-seg-name.r { color: var(--red); }
+.format-seg-name.g { color: var(--green); }
+.format-seg-name.a { color: var(--accent); }
+.format-seg-title {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+.format-seg-desc { font-size: 13px; color: var(--ink-mute); line-height: 1.7; max-width: 560px; }
+
+/* ── THEMES ── */
+.themes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 40px;
+}
+.theme-cell {
+  background: var(--parchment);
+  padding: 28px 24px;
+}
+.theme-num {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--cream-deep);
+  line-height: 1;
+  margin-bottom: 10px;
+}
+.theme-title {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+.theme-body { font-size: 12px; color: var(--ink-mute); line-height: 1.65; }
+.theme-source {
+  font-size: 10px;
+  color: var(--border);
+  letter-spacing: 0.06em;
+  margin-top: 10px;
+  text-transform: uppercase;
+}
+
+/* ── SPEAKERS ── */
+.speakers-section { padding: 80px 48px; }
+.speakers-inner { max-width: 900px; margin: 0 auto; }
+.speakers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin-top: 40px;
+}
+.speaker-card {
+  background: var(--parchment);
+  padding: 40px 36px;
+}
+.speaker-card.primary { background: var(--cream-deep); }
+
+.speaker-role {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.speaker-role .pip { width: 6px; height: 6px; border-radius: 50%; }
+.pip-r { background: var(--red); }
+.pip-g { background: var(--green); }
+.role-text-r { color: var(--red); }
+.role-text-g { color: var(--green); }
+
+.speaker-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--border);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--ink-mute);
+  flex-shrink: 0;
+}
+.avatar-sha { background: var(--red-light); color: var(--red); }
+.avatar-fir { background: var(--green-light); color: var(--green); }
+
+.speaker-name {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.speaker-handle {
+  font-size: 12px;
+  color: var(--accent-mute);
+  margin-bottom: 20px;
+  letter-spacing: 0.04em;
+}
+.speaker-bio {
+  font-size: 13px;
+  color: var(--ink-mid);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.speaker-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+}
+.tag {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 2px;
+}
+.tag-r { background: var(--red-light); color: var(--red); }
+.tag-g { background: var(--green-light); color: var(--green); }
+.tag-a { background: var(--accent-light,#e8e0d4); color: var(--accent); }
+
+/* ── PULL QUOTE ── */
+.pull-section {
+  background: var(--parchment);
+  padding: 72px 48px;
+  text-align: center;
+}
+.pull-inner { max-width: 680px; margin: 0 auto; }
+.pull-rule-r { width: 32px; height: 2px; background: var(--red); margin: 0 auto 32px; }
+.pull-quote {
+  font-family: var(--serif);
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+.pull-quote em { color: var(--green); font-style: normal; }
+.pull-source {
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--accent-mute);
+  font-weight: 500;
+}
+.pull-rule-g { width: 32px; height: 2px; background: var(--green); margin: 20px auto 0; }
+
+/* ── BOTTOM CTA ── */
+.bottom-cta {
+  padding: 80px 48px;
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.bottom-cta h2 {
+  font-family: var(--serif);
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 300;
+  color: var(--ink);
+  margin-bottom: 16px;
+  line-height: 1.25;
+}
+.bottom-cta p {
+  font-size: 14px;
+  color: var(--ink-mute);
+  max-width: 480px;
+  margin: 0 auto 36px;
+  line-height: 1.75;
+}
+.cta-cluster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.btn-notify {
+  display: inline-block;
+  padding: 15px 40px;
+  background: var(--accent);
+  color: var(--parchment);
+  font-size: 12px;
+  font-family: var(--sans);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 3px;
+  border: none;
+  cursor: default;
+  opacity: 0.68;
+}
+.btn-notify-note {
+  font-size: 11px;
+  color: var(--accent-mute);
+  letter-spacing: 0.06em;
+  font-style: italic;
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 28px 48px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.footer-logo { font-family: var(--serif); font-size: 16px; color: var(--ink-mute); text-decoration: none; }
+.footer-logo span { color: var(--accent-mute); }
+.footer-series { font-size: 11px; color: var(--border); letter-spacing: 0.06em; }
+.footer-note { font-size: 11px; color: var(--accent-mute); letter-spacing: 0.06em; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  nav, .container, .format-section, .speakers-section,
+  .pull-section, .bottom-cta, footer { padding-left: 24px; padding-right: 24px; }
+  .hero { padding: 64px 24px 56px; }
+  .hero-ghost { display: none; }
+  .what-grid, .speakers-grid, .themes-grid { grid-template-columns: 1fr; }
+  .format-row { grid-template-columns: 1fr; gap: 8px; }
+  hr.div { margin: 0 24px; }
+  .meta-strip { flex-direction: column; }
+  .meta-cell { border-right: none; border-bottom: 1px solid var(--border); padding: 14px 0; margin-right: 0; }
+  .meta-cell:last-child { border-bottom: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="index.html" class="nav-logo">Thirty<span>Three</span></a>
+  <span class="nav-series">Fusion Conversations · Session 01</span>
+</nav>
+
+<!-- ── HERO ── -->
+<header class="hero">
+  <div class="hero-ghost" aria-hidden="true">01</div>
+  <div class="hero-inner hero-content">
+    <span class="eyebrow">ThirtyThree presents</span>
+    <span class="series-name">Fusion Conversations — a monthly peer series</span>
+
+    <h1 class="hero-title">
+      Tafakkur in the<br>
+      Age of <em>AI</em>
+    </h1>
+    <p class="hero-subtitle">
+      What does it mean to think — really think — when machines can produce?
+    </p>
+
+    <div class="meta-strip">
+      <div class="meta-cell">
+        <div class="meta-label">Date</div>
+        <div class="meta-value coming">Mid-July 2026</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">Format</div>
+        <div class="meta-value">~50 min structured · open discussion</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">Session</div>
+        <div class="meta-value">01 of an ongoing monthly series</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">Language</div>
+        <div class="meta-value">English · Bahasa Malaysia</div>
+      </div>
+    </div>
+
+    <div class="btn-cta-wrap">
+      <span class="btn-cta">Notify me when seats open</span>
+      <span class="btn-soon">Registration opening soon</span>
+    </div>
+  </div>
+</header>
+
+<hr class="div">
+
+<!-- ── WHAT THIS IS ── -->
+<section class="container">
+  <span class="eyebrow">What this is</span>
+  <h2 style="font-family:var(--serif);font-size:clamp(24px,3.5vw,36px);font-weight:300;line-height:1.28;color:var(--ink);margin-bottom:14px;">
+    Not a webinar. Not a podcast.<br>A peer conversation, in public.
+  </h2>
+  <p style="font-size:14px;color:var(--ink-mute);line-height:1.75;max-width:600px;">
+    Fusion Conversations is a monthly series where two practitioners — building at the intersection of technology, Islamic thought, and civilizational purpose — think out loud together. No slides. No keynote. Just tafakkur: two cognitions producing a third.
+  </p>
+
+  <div class="what-grid">
+    <div class="what-cell accent-r">
+      <span class="what-icon r">The format</span>
+      <p class="what-head">50 minutes of structured thinking + open floor</p>
+      <p class="what-body">Four segments: check-in, build exchange (what each of us is shipping), the fusion thread (where the ideas collide), and a mutual ask. Ends with a concrete follow-up — no NATO (No Action Talk Only).</p>
+    </div>
+    <div class="what-cell accent-g">
+      <span class="what-icon g">The philosophy</span>
+      <p class="what-head">Peer learning as a more humbling model than the guru</p>
+      <p class="what-body">No single lead figure. Firdaus and Sha come as equals with different labs, different languages, and different vantage points. The goal is wisdom transfer — not performance. Ship conversations, not content.</p>
+    </div>
+    <div class="what-cell accent-g">
+      <span class="what-icon g">Who it's for</span>
+      <p class="what-head">Muslim professionals who build things and want to think clearly about why</p>
+      <p class="what-body">Engineers, researchers, educators, founders who feel the pull between productivity and meaning — and want a space that takes both seriously. Bahasa Malaysia and English speakers both welcome.</p>
+    </div>
+    <div class="what-cell accent-r">
+      <span class="what-icon r">The series</span>
+      <p class="what-head">Monthly, recurring — ~15th of each month</p>
+      <p class="what-body">Session 01 launches the format. Future sessions may bring in guests from the Rehlah Intensive (Indonesia) audience and beyond. Each session is self-contained; the series compounds over time.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ── FORMAT / RUN OF SHOW ── -->
+<div class="format-section">
+  <div class="format-inner">
+    <span class="eyebrow">Session structure</span>
+    <h2 style="font-family:var(--serif);font-size:clamp(24px,3.5vw,36px);font-weight:300;line-height:1.28;color:var(--ink);">
+      How the hour runs
+    </h2>
+
+    <div class="format-row">
+      <div class="format-time">0–10 min</div>
+      <div>
+        <span class="format-seg-name a">Check-in</span>
+        <p class="format-seg-title">Where are we, actually?</p>
+        <p class="format-seg-desc">A brief personal check-in — not pleasantries, but a genuine reading of where each person is arriving from. Sets the register for honest conversation rather than performance.</p>
+      </div>
+    </div>
+
+    <div class="format-row">
+      <div class="format-time">10–25 min</div>
+      <div>
+        <span class="format-seg-name g">Build exchange</span>
+        <p class="format-seg-title">What are you shipping?</p>
+        <p class="format-seg-desc">Each speaker shares what they are actively building. Session 01: Sha on Hermes governance architecture + AI safety experiments + Irori. Firdaus on Kakehashi automation stack + Firdaus Labs + Bahasa Melayu content strategy. The audience sees real work, not polished retrospectives.</p>
+      </div>
+    </div>
+
+    <div class="format-row">
+      <div class="format-time">25–45 min</div>
+      <div>
+        <span class="format-seg-name r">The fusion thread</span>
+        <p class="format-seg-title">Where the ideas collide</p>
+        <p class="format-seg-desc">The core of the session. Session 01 threads: tafakkur as the missing link between AI tools and meaningful output (al-Ghazālī's two-cognitions-make-a-third). Civilizational thinking vs. complacency. The privilege and responsibility of insan. Inspirational adults as infrastructure. Hayatan ṭayyibah — the life worth living — and what sa'ā (striving recognized by Allah) actually demands of a Muslim professional.</p>
+      </div>
+    </div>
+
+    <div class="format-row">
+      <div class="format-time">45–55 min</div>
+      <div>
+        <span class="format-seg-name a">Mutual ask + close</span>
+        <p class="format-seg-title">What do we actually need from each other?</p>
+        <p class="format-seg-desc">Each speaker names one concrete ask — a resource, a connection, feedback, a decision. Open floor for audience questions. Closes with one follow-up commitment from each speaker, stated publicly. No NATO.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="div">
+
+<!-- ── SESSION THEMES ── -->
+<section class="container">
+  <span class="eyebrow">Session 01 — themes on the table</span>
+  <h2 style="font-family:var(--serif);font-size:clamp(24px,3.5vw,36px);font-weight:300;line-height:1.28;color:var(--ink);margin-bottom:14px;">
+    What we will actually think through
+  </h2>
+  <p style="font-size:14px;color:var(--ink-mute);line-height:1.75;max-width:600px;margin-bottom:0;">
+    These emerged from a 90-minute pre-session between Firdaus and Sha. They are not fixed — the conversation will go where it goes.
+  </p>
+
+  <div class="themes-grid">
+    <div class="theme-cell">
+      <div class="theme-num">01</div>
+      <p class="theme-title">Tafakkur as the missing layer</p>
+      <p class="theme-body">Al-Ghazālī defines tafakkur as bringing two cognitions together to produce a third — new insight that wasn't in either one alone. Without it, AI tools stay informational. With it, they become meaningful. How do we build tafakkur into our workflows — not just our rhetoric?</p>
+      <p class="theme-source">Al-Ghazālī — Iḥyāʾ, on reflection</p>
+    </div>
+    <div class="theme-cell">
+      <div class="theme-num">02</div>
+      <p class="theme-title">Civilizational thinking vs. complacency</p>
+      <p class="theme-body">Hamka's warning: mere survival is animalistic. The ummah's call is khilafah — not just endurance but stewardship across time. Jewish and Ottoman examples of long-horizon thinking. What does a 30-year horizon look like for a Muslim professional in 2026?</p>
+      <p class="theme-source">Hamka · Ottoman historiography</p>
+    </div>
+    <div class="theme-cell">
+      <div class="theme-num">03</div>
+      <p class="theme-title">Inspirational adults as infrastructure</p>
+      <p class="theme-body">Sheikh Sha'rawi on Anas bin Malik — shaped not just by the Prophet ﷺ but by being inside that ecosystem. Inspirational adults ripple outward to families, schools, strangers. Sha and Firdaus as peer models rather than gurus. What does that responsibility look like in practice?</p>
+      <p class="theme-source">Sheikh Mutawalli Sha'rawi</p>
+    </div>
+    <div class="theme-cell">
+      <div class="theme-num">04</div>
+      <p class="theme-title">Hayatan ṭayyibah & the kasaba / sa'ā distinction</p>
+      <p class="theme-body">Two Quranic roots for striving — kasaba (acquisition) and sa'ā (purposeful effort recognized by Allah). The life worth living is not just productive; it is recognized. What does sa'ayuhum mashkūrā demand of how we spend our working hours?</p>
+      <p class="theme-source">Quran 53:39 · 20:15</p>
+    </div>
+    <div class="theme-cell">
+      <div class="theme-num">05</div>
+      <p class="theme-title">Having your own lab</p>
+      <p class="theme-body">Firdaus on observing Japan: many products for the same need because each maker's uniqueness comes from how they were raised and what they were given to see. A lab normalizes failure so the rare success can emerge. What does running your own lab — as a Muslim, in Malaysia — actually look like?</p>
+      <p class="theme-source">Firdaus Labs · CetaLabs</p>
+    </div>
+    <div class="theme-cell">
+      <div class="theme-num">06</div>
+      <p class="theme-title">Language as a civilizational choice</p>
+      <p class="theme-body">Firdaus writes in Bahasa Malaysia deliberately — to extract and deliver local wisdom. Sha builds in English first for sustainability, then extends. Za'ba and Dr. Afifi Akiki as reference points. Is the language we build in a strategic decision or a values decision? Can it be both?</p>
+      <p class="theme-source">Za'ba · Dr. Afifi Akiki</p>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ── PULL QUOTE ── -->
+<div class="pull-section">
+  <div class="pull-inner">
+    <div class="pull-rule-r"></div>
+    <p class="pull-quote">
+      "Knowledge is the arrival of <em>meaning</em> to the soul. Without tafakkur, AI tools stay informational and never become meaningful."
+    </p>
+    <span class="pull-source">Al-Ghazālī — paraphrased in session · Iḥyāʾ ʿUlūm al-Dīn</span>
+    <div class="pull-rule-g"></div>
+  </div>
+</div>
+
+<hr class="div">
+
+<!-- ── SPEAKERS ── -->
+<section class="speakers-section">
+  <div class="speakers-inner">
+    <span class="eyebrow">Your speakers</span>
+    <h2 style="font-family:var(--serif);font-size:clamp(24px,3.5vw,36px);font-weight:300;line-height:1.28;color:var(--ink);margin-bottom:8px;">
+      Two practitioners, two labs,<br>one conversation.
+    </h2>
+    <p style="font-size:14px;color:var(--ink-mute);line-height:1.75;max-width:540px;margin-bottom:0;">
+      No keynotes. No stages. Two people who are actively building — and thinking hard about why.
+    </p>
+
+    <div class="speakers-grid">
+
+      <!-- SHA -->
+      <div class="speaker-card primary">
+        <div class="speaker-role">
+          <span class="pip pip-r"></span>
+          <span class="role-text-r">Host & Speaker</span>
+        </div>
+        <div class="speaker-avatar avatar-sha">S</div>
+        <h3 class="speaker-name">Nurshafira</h3>
+        <p class="speaker-handle">shafiranoh.com · @sha</p>
+        <p class="speaker-bio">
+          Independent AI safety researcher and founder at CetaLabs and Irori. Building evaluation tools that make AI safety legible beyond technical audiences — and an education platform that prioritises meaning-making over exam prep. Senior tech policy fellow at Wawasanex. Apart Research Education Track Prize winner (Morph, 2025).
+        </p>
+        <p class="speaker-bio">
+          Currently: Hermes (personal AI governance architecture), BankBench-MY (Sinar Project fellowship), and the seam-over-model conjecture in agentic AI safety.
+        </p>
+        <div class="speaker-tags">
+          <span class="tag tag-r">AI Safety</span>
+          <span class="tag tag-r">Meta-evals</span>
+          <span class="tag tag-a">Irori / Education</span>
+          <span class="tag tag-a">CetaLabs</span>
+          <span class="tag tag-g">Islamic epistemics</span>
+        </div>
+      </div>
+
+      <!-- FIRDAUS -->
+      <div class="speaker-card">
+        <div class="speaker-role">
+          <span class="pip pip-g"></span>
+          <span class="role-text-g">Speaker</span>
+        </div>
+        <div class="speaker-avatar avatar-fir">F</div>
+        <h3 class="speaker-name">Firdaus</h3>
+        <p class="speaker-handle">Firdaus Labs · Kakehashi</p>
+        <p class="speaker-bio">
+          Builder and researcher working at the intersection of automation, Bahasa Malaysia content strategy, and civilizational thinking. Founder of Firdaus Labs — a personal R&D practice that normalizes experimentation and expects most experiments to fail so the rare success can emerge.
+        </p>
+        <p class="speaker-bio">
+          Currently: Kakehashi (automated video pipeline — YouTube scraping → AI clip selection → Whisper subtitling → cross-platform publishing), and a deliberate strategy of building local wisdom in Bahasa Malaysia first.
+        </p>
+        <div class="speaker-tags">
+          <span class="tag tag-g">Firdaus Labs</span>
+          <span class="tag tag-g">Kakehashi</span>
+          <span class="tag tag-a">Automation</span>
+          <span class="tag tag-a">Bahasa Malaysia</span>
+          <span class="tag tag-r">Civilizational thought</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ── BOTTOM CTA ── -->
+<div class="bottom-cta">
+  <h2>Be in the room<br>when the thinking happens.</h2>
+  <p>Registration opens closer to the date. Drop your email on the ThirtyThree newsletter to be the first to know — and to receive the pre-session reading note we send before Session 01.</p>
+  <div class="cta-cluster">
+    <span class="btn-notify">Notify me when seats open</span>
+    <span class="btn-notify-note">Coming soon · Mid-July 2026 · Registration via ThirtyThree newsletter</span>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-left">
+    <a href="index.html" class="footer-logo">Thirty<span>Three</span></a>
+    <span class="footer-series">· Fusion Conversations Series</span>
+  </div>
+  <span class="footer-note">Session 01 · Mid-July 2026 · Malaysia</span>
+</footer>
+
+</body>
+</html>
