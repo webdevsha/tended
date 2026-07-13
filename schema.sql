@@ -84,6 +84,7 @@ create table if not exists journal_entries (
 create table if not exists weekly_reviews (
   id uuid primary key default gen_random_uuid(),
   week_start date not null unique,
+  content text,                           -- full reflection text (Hermes weekly reflection)
   wins text,
   stuck text,
   irori_hours numeric(5,1) default 0,
@@ -91,6 +92,9 @@ create table if not exists weekly_reviews (
   energy integer check (energy between 1 and 5),
   created_at timestamptz default now()
 );
+
+-- Migration for existing projects created before content existed:
+-- alter table weekly_reviews add column if not exists content text;
 
 create table if not exists plc_log (
   id uuid primary key default gen_random_uuid(),

@@ -163,6 +163,25 @@ server.tool(
 );
 
 server.tool(
+  "add_weekly_review",
+  "Add or update a Weekly Review entry (upserted by week_start). Use for the Sunday Weekly Reflection — NOT add_journal_draft.",
+  {
+    week_start: z.string().describe("YYYY-MM-DD, Monday of the week being reviewed"),
+    content: z.string().describe("Full weekly reflection text"),
+    wins: z.string().optional(),
+    stuck: z.string().optional(),
+    irori_hours: z.number().optional(),
+    ais_hours: z.number().optional(),
+    energy: z.number().int().min(1).max(5).optional(),
+  },
+  async (args) => {
+    const { data, error } = await sb.from("weekly_reviews")
+      .upsert({ ...args }, { onConflict: "week_start" }).select().single();
+    return error ? fail(error) : ok(data);
+  }
+);
+
+server.tool(
   "log_plc",
   "Log a Personal Learning Curriculum item: Quran log, highlight, or other.",
   {
