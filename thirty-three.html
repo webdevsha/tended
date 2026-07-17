@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ThirtyThree — A Newsletter on Purposeful Becoming</title>
+<meta name="description" content="A slow, serious newsletter for Muslim professionals building a life worth keeping. Weekly reflections on character, career, and the long game.">
+<link rel="canonical" href="https://dev.tended.pages.dev/thirty-three">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dev.tended.pages.dev/thirty-three">
+<meta property="og:title" content="ThirtyThree — A Newsletter on Purposeful Becoming">
+<meta property="og:description" content="A slow, serious newsletter for Muslim professionals building a life worth keeping. Weekly reflections on character, career, and the long game.">
+<meta property="og:image" content="https://ik.imagekit.io/cbctech/Screenshot%202026-07-03%20at%203.49.04%E2%80%AFPM.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="ThirtyThree">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ThirtyThree — A Newsletter on Purposeful Becoming">
+<meta name="twitter:description" content="A slow, serious newsletter for Muslim professionals building a life worth keeping. Weekly reflections on character, career, and the long game.">
+<meta name="twitter:image" content="https://ik.imagekit.io/cbctech/Screenshot%202026-07-03%20at%203.49.04%E2%80%AFPM.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* ─── TOKENS ─── */
+:root {
+  --ink:          #1a1814;
+  --ink-mid:      #4a4640;
+  --ink-mute:     #8a857d;
+  --parchment:    #f7f4ee;
+  --warm-white:   #fdfcf9;
+  --accent:       #7c6e5a;
+  --accent-mute:  #b0a390;
+  --accent-light: #e8e0d4;
+  --border:       #ddd7cc;
+  --green:        #6b7c5e;
+  --green-light:  #dce6d5;
+  --green-mute:   #a3b396;
+  --red:          #8c4a3a;
+  --red-light:    #f0dbd6;
+  --red-mute:     #c49080;
+  --dot-remain:   #c8bfb0;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans:  'Inter', system-ui, sans-serif;
+}
+
+/* ─── BASE ─── */
+body {
+  background: var(--warm-white);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── NAV ─── */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 48px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--warm-white);
+  z-index: 100;
+}
+.logo {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  text-decoration: none;
+}
+.logo span { color: var(--accent-mute); }
+.nav-links { display: flex; gap: 32px; list-style: none; }
+.nav-links a {
+  font-size: 13px;
+  color: var(--ink-mute);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 400;
+  transition: color .2s;
+}
+.nav-links a:hover { color: var(--ink); }
+
+/* ─── LAYOUT ─── */
+.container  { max-width: 900px; margin: 0 auto; padding: 96px 48px; }
+.full-bleed { padding: 72px 48px; }
+hr.divider  { border: none; border-top: 1px solid var(--border); margin: 0 48px; }
+
+/* ─── EYEBROW ─── */
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-mute);
+  font-weight: 500;
+  margin-bottom: 14px;
+  display: block;
+}
+
+/* ─── SECTION TITLES ─── */
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(24px, 3.5vw, 36px);
+  font-weight: 300;
+  line-height: 1.28;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+.section-sub {
+  font-size: 14px;
+  color: var(--ink-mute);
+  line-height: 1.75;
+  max-width: 560px;
+  margin-bottom: 20px;
+}
+
+/* ─── HERO ─── */
+.hero {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 120px 48px 80px;
+  text-align: center;
+}
+.hero-hadith {
+  font-family: var(--serif);
+  font-size: clamp(22px, 3.5vw, 36px);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--ink);
+  max-width: 680px;
+  margin: 0 auto 14px;
+  border-left: 2px solid var(--accent-mute);
+  padding-left: 32px;
+  text-align: left;
+}
+.hero-source {
+  font-size: 12px;
+  color: var(--ink-mute);
+  letter-spacing: 0.06em;
+  margin: 0 auto 60px;
+  text-align: left;
+  padding-left: 34px;
+  max-width: 680px;
+}
+.hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(30px, 5vw, 54px);
+  font-weight: 300;
+  line-height: 1.22;
+  color: var(--ink);
+  margin-bottom: 24px;
+}
+.hero h1 em { font-style: italic; color: var(--green); }
+.hero-sub {
+  font-size: 15px;
+  color: var(--ink-mute);
+  max-width: 460px;
+  margin: 0 auto 48px;
+  line-height: 1.75;
+}
+
+/* ─── SHARED FORM STYLES ─── */
+.subscribe-form {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.form-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.field-name, .field-email {
+  padding: 13px 20px;
+  border: 1px solid var(--border);
+  background: var(--warm-white);
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: var(--sans);
+  color: var(--ink);
+  outline: none;
+  transition: border-color .2s;
+}
+.field-name  { width: 180px; }
+.field-email { width: 220px; }
+.field-name:focus,
+.field-email:focus { border-color: var(--accent-mute); }
+.field-name::placeholder,
+.field-email::placeholder { color: var(--accent-mute); }
+
+.btn-subscribe {
+  padding: 13px 28px;
+  background: var(--accent);
+  color: var(--parchment);
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: var(--sans);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background .2s;
+}
+.btn-subscribe:hover    { background: var(--ink); }
+.btn-subscribe:disabled { background: var(--accent-mute); cursor: not-allowed; }
+
+.form-note {
+  font-size: 11px;
+  color: var(--ink-mute);
+  margin-top: 14px;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+/* status messages */
+.form-status {
+  margin-top: 14px;
+  font-size: 13px;
+  min-height: 20px;
+  text-align: center;
+  transition: opacity .3s;
+}
+.form-status.success { color: var(--green); }
+.form-status.error   { color: var(--red); }
+.form-status.loading { color: var(--accent-mute); }
+
+/* ─── DARK FORM (bottom CTA) ─── */
+.field-email-dark {
+  padding: 13px 20px;
+  border: 1px solid #3d3830;
+  background: transparent;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: var(--sans);
+  color: var(--parchment);
+  width: 220px;
+  outline: none;
+  transition: border-color .2s;
+}
+.field-name-dark {
+  padding: 13px 20px;
+  border: 1px solid #3d3830;
+  background: transparent;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: var(--sans);
+  color: var(--parchment);
+  width: 160px;
+  outline: none;
+  transition: border-color .2s;
+}
+.field-email-dark:focus,
+.field-name-dark:focus  { border-color: var(--accent-mute); }
+.field-email-dark::placeholder,
+.field-name-dark::placeholder { color: #5a5248; }
+.btn-subscribe-dark {
+  padding: 13px 28px;
+  background: var(--accent);
+  color: var(--parchment);
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: var(--sans);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background .2s;
+}
+.btn-subscribe-dark:hover    { background: var(--green); }
+.btn-subscribe-dark:disabled { background: #3d3830; cursor: not-allowed; }
+.form-status-dark {
+  margin-top: 14px;
+  font-size: 13px;
+  min-height: 20px;
+  text-align: center;
+}
+.form-status-dark.success { color: var(--green-mute); }
+.form-status-dark.error   { color: var(--red-mute); }
+.form-status-dark.loading { color: #5a5248; }
+
+/* ─── CRISIS ─── */
+.crisis { background: var(--parchment); text-align: center; }
+.crisis-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  max-width: 720px;
+  margin: 0 auto 48px;
+}
+.crisis-cell { background: var(--warm-white); padding: 32px 24px; }
+.crisis-num  { font-family: var(--serif); font-size: 48px; font-weight: 300; color: var(--red); line-height: 1; }
+.crisis-unit { font-size: 11px; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.08em; margin: 8px 0 10px; }
+.crisis-desc { font-size: 12px; color: var(--ink-mute); line-height: 1.55; }
+.crisis-src  { font-size: 10px; color: var(--border); margin-top: 6px; letter-spacing: 0.04em; }
+.crisis-conclusion {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--ink-mid);
+  max-width: 540px;
+  margin: 0 auto;
+  line-height: 1.65;
+}
+
+/* ─── LIFE GRID ─── */
+.grid-legend { display: flex; gap: 24px; margin-bottom: 20px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-mute); }
+.legend-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.ld-used     { background: var(--red); }
+.ld-now      { background: var(--accent); }
+.ld-remain   { background: var(--dot-remain); }
+.ld-eternity { background: var(--green-light); border: 1px solid var(--green-mute); }
+
+.age-row     { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+.age-row label { font-size: 13px; color: var(--ink-mute); }
+#age-slider {
+  -webkit-appearance: none;
+  width: 180px; height: 2px;
+  background: var(--border); outline: none; border-radius: 2px;
+}
+#age-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%; background: var(--accent); cursor: pointer;
+}
+#age-slider::-moz-range-thumb {
+  width: 14px; height: 14px;
+  border-radius: 50%; background: var(--accent); cursor: pointer; border: none;
+}
+#age-display { font-family: var(--serif); font-size: 20px; color: var(--ink); min-width: 80px; }
+#life-dots   { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; transition: transform .15s; cursor: default; }
+.dot:hover     { transform: scale(1.6); }
+.dot.used      { background: var(--red); }
+.dot.now       { background: var(--accent); box-shadow: 0 0 0 2px var(--warm-white), 0 0 0 3.5px var(--accent); }
+.dot.remain    { background: var(--dot-remain); }
+.dot.eternity  { background: var(--green-light); border: 1px solid var(--green-mute); }
+#grid-note { font-size: 12px; color: var(--ink-mute); line-height: 1.65; font-style: italic; }
+
+/* ─── JANNAH ─── */
+.jannah-section { background: var(--parchment); }
+.jannah-inner {
+  max-width: 900px; margin: 0 auto; padding: 96px 48px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: start;
+}
+.age-bars { display: flex; flex-direction: column; gap: 10px; }
+.age-bar-row { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--ink-mute); }
+.age-bar-label { width: 84px; text-align: right; font-size: 11px; flex-shrink: 0; }
+.age-bar-track { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.age-bar-fill   { height: 100%; border-radius: 3px; background: var(--red); }
+.bar-formation  { background: var(--green); }
+.bar-ashuddahu  { background: var(--accent); }
+.bar-legacy     { background: var(--accent-mute); }
+.bar-eternity   { background: var(--green); opacity: 0.5; }
+.age-bar-val        { font-size: 11px; min-width: 64px; }
+.bar-eternity-val   { color: var(--green); font-weight: 500; }
+.jannah-caption {
+  font-size: 11px; color: var(--accent-mute);
+  font-style: italic; line-height: 1.6;
+  margin-top: 20px; max-width: 240px;
+}
+
+/* ─── SCHOLARS ─── */
+.scholar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 40px; }
+.scholar-card { background: var(--parchment); padding: 36px 32px; }
+.scholar-quote {
+  font-family: var(--serif);
+  font-size: 18px; font-weight: 300; font-style: italic;
+  line-height: 1.5; color: var(--ink); margin-bottom: 16px;
+}
+.scholar-name { font-size: 11px; letter-spacing: 0.10em; text-transform: uppercase; color: var(--green); font-weight: 500; }
+.scholar-note { font-size: 12px; color: var(--ink-mute); margin-top: 8px; line-height: 1.6; }
+
+/* ─── READING ─── */
+.reading-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-top: 40px; }
+.book-card { background: var(--parchment); padding: 28px 24px; border-top: 2px solid var(--green-mute); }
+.book-tag { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); margin-bottom: 14px; font-weight: 500; display: block; }
+.book-title { font-family: var(--serif); font-size: 17px; font-weight: 400; color: var(--ink); margin-bottom: 5px; line-height: 1.3; }
+.book-author { font-size: 11px; color: var(--ink-mute); margin-bottom: 14px; }
+.book-reflection { font-size: 12px; color: var(--ink-mid); line-height: 1.65; font-style: italic; }
+
+/* ─── DARK NEWSLETTER SECTION ─── */
+.newsletter-bottom { background: var(--ink); padding: 96px 48px; text-align: center; }
+.nl-eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-mute); font-weight: 500; margin-bottom: 24px; display: block; }
+.nl-title { font-family: var(--serif); font-size: clamp(28px, 4vw, 44px); font-weight: 300; color: var(--parchment); line-height: 1.25; margin-bottom: 16px; }
+.nl-sub { font-size: 14px; color: var(--accent-mute); margin: 0 auto 40px; line-height: 1.75; max-width: 520px; }
+
+/* ─── FOOTER ─── */
+footer { padding: 28px 48px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.footer-logo { font-family: var(--serif); font-size: 16px; color: var(--ink-mute); }
+.footer-note { font-size: 11px; color: var(--accent-mute); letter-spacing: 0.06em; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 700px) {
+  nav, footer { padding: 20px 24px; }
+  .nav-links { gap: 20px; }
+  .hero, .container { padding-left: 24px; padding-right: 24px; }
+  .hero { padding-top: 72px; padding-bottom: 56px; }
+  .full-bleed, .jannah-inner, .newsletter-bottom { padding-left: 24px; padding-right: 24px; }
+  hr.divider { margin: 0 24px; }
+  .crisis-grid, .scholar-grid, .reading-grid { grid-template-columns: 1fr; }
+  .jannah-inner { grid-template-columns: 1fr; gap: 40px; padding-top: 64px; padding-bottom: 64px; }
+  .hero-hadith { font-size: 20px; padding-left: 20px; }
+  .hero-source { padding-left: 22px; }
+  .field-name, .field-email, .field-name-dark, .field-email-dark { width: 100%; }
+  .form-row, .subscribe-form { flex-direction: column; align-items: stretch; }
+  .btn-subscribe, .btn-subscribe-dark { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .dot { transition: none; } }
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <a href="#" class="logo">Thirty<span>Three</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#archive">Archive</a></li>
+    <li><a href="#subscribe">Subscribe</a></li>
+  </ul>
+</nav>
+
+<!-- ─── HERO ─── -->
+<header class="hero">
+  <span class="eyebrow">A newsletter on purposeful becoming</span>
+  <blockquote class="hero-hadith">
+    "The people of Paradise will enter at the age of thirty-three, in the image of Adam, sixty cubits tall."
+  </blockquote>
+  <p class="hero-source">— Tirmidhi, Hadith 2545 · graded Hasan Sahih</p>
+  <h1>
+    If thirty-three is the age of<br>
+    <em>eternal flourishing</em> —<br>
+    who are you becoming to get there?
+  </h1>
+  <p class="hero-sub">A slow, serious newsletter for Muslim professionals building a life worth keeping. Weekly reflections on character, career, and the long game.</p>
+
+  <!-- HERO SUBSCRIBE FORM -->
+  <div class="subscribe-form" id="hero-form">
+    <div class="form-row">
+      <input class="field-name"  type="text"  id="hero-name"  placeholder="Your name"    autocomplete="given-name" aria-label="First name">
+      <input class="field-email" type="email" id="hero-email" placeholder="your@email.com" autocomplete="email"     aria-label="Email address">
+      <button class="btn-subscribe" id="hero-btn" onclick="handleSubscribe('hero')">Join the reading</button>
+    </div>
+  </div>
+  <div class="form-status" id="hero-status"></div>
+  <p class="form-note">Free · Weekly · No noise</p>
+</header>
+
+<hr class="divider">
+
+<!-- ─── CRISIS BAND ─── -->
+<section class="crisis full-bleed" id="about">
+  <span class="eyebrow">Why this matters now — 2026 data</span>
+  <div class="crisis-grid">
+    <div class="crisis-cell">
+      <div class="crisis-num">82%</div>
+      <div class="crisis-unit">of knowledge workers</div>
+      <div class="crisis-desc">report feeling burned out — the highest recorded rate in six years</div>
+      <div class="crisis-src">DHR Global · 2026</div>
+    </div>
+    <div class="crisis-cell">
+      <div class="crisis-num">25</div>
+      <div class="crisis-unit">age of peak burnout</div>
+      <div class="crisis-desc">Gen Z hits burnout 17 years earlier than prior generations — before their careers have even properly begun</div>
+      <div class="crisis-src">Eagle Hill Consulting · 2026</div>
+    </div>
+    <div class="crisis-cell">
+      <div class="crisis-num">$322B</div>
+      <div class="crisis-unit">lost annually</div>
+      <div class="crisis-desc">in global productivity — not from laziness, but from work without meaning or direction</div>
+      <div class="crisis-src">WHO / Gallup · 2025–26</div>
+    </div>
+  </div>
+  <p class="crisis-conclusion">
+    The crisis is not a shortage of ambition.<br>It is a shortage of orientation.
+  </p>
+</section>
+
+<hr class="divider">
+
+<!-- ─── LIFE GRID ─── -->
+<section class="container">
+  <span class="eyebrow">Your life, counted</span>
+  <h2 class="section-title">Most of us are already halfway through the Prophet's ﷺ lifespan</h2>
+  <p class="section-sub">Each dot is one year. The Prophet ﷺ lived 63 years. Move the slider to your age — then consider what thirty-three means in relation to where you stand.</p>
+  <div class="age-row">
+    <label for="age-slider">Your age</label>
+    <input type="range" id="age-slider" min="18" max="63" value="30" aria-label="Your current age">
+    <span id="age-display">30 years</span>
+  </div>
+  <div class="grid-legend">
+    <div class="legend-item"><span class="legend-dot ld-used"></span>Years lived</div>
+    <div class="legend-item"><span class="legend-dot ld-now"></span>You, now</div>
+    <div class="legend-item"><span class="legend-dot ld-remain"></span>Remaining to 63</div>
+    <div class="legend-item"><span class="legend-dot ld-eternity"></span>After 63 — eternity</div>
+  </div>
+  <div id="life-dots" role="img" aria-label="Life grid visualization"></div>
+  <p id="grid-note" class="grid-note"></p>
+</section>
+
+<hr class="divider">
+
+<!-- ─── JANNAH / 33 ─── -->
+<div class="jannah-section">
+  <div class="jannah-inner">
+    <div class="jannah-text">
+      <span class="eyebrow">The Thirty-Three thesis</span>
+      <h2 class="section-title">Thirty-three is not a deadline.<br>It is a destination state.</h2>
+      <p class="section-sub">Ibn ʿArabī in the <em>Futūḥāt al-Makkiyya</em> describes 33 as the age of <em>kamāl</em> — completion, the human being at full flourishing. The Quran marks 40 as <em>ashuddahu</em> (full strength), but the hadith tradition places the people of Paradise eternally at 33 — after the excess of youth has settled, before the decline of age begins.</p>
+      <p class="section-sub">The question Thirty-Three asks is not "what career maximises your output?" but "what kind of person are you building, year by year, such that at thirty-three — and at every age — you are closer to the person worth becoming for eternity?"</p>
+    </div>
+    <div>
+      <div class="age-bars">
+        <span class="eyebrow" style="margin-bottom:16px;">The developmental arc</span>
+        <div class="age-bar-row">
+          <span class="age-bar-label">Birth → 15</span>
+          <div class="age-bar-track"><div class="age-bar-fill" style="width:24%"></div></div>
+          <span class="age-bar-val">Fitrah</span>
+        </div>
+        <div class="age-bar-row">
+          <span class="age-bar-label" style="color:var(--green);font-weight:500;">15 → 33</span>
+          <div class="age-bar-track"><div class="age-bar-fill bar-formation" style="width:57%"></div></div>
+          <span class="age-bar-val" style="color:var(--green);font-weight:500;">Formation</span>
+        </div>
+        <div class="age-bar-row">
+          <span class="age-bar-label">33 → 40</span>
+          <div class="age-bar-track"><div class="age-bar-fill bar-ashuddahu" style="width:70%"></div></div>
+          <span class="age-bar-val">Ashuddahu</span>
+        </div>
+        <div class="age-bar-row">
+          <span class="age-bar-label">40 → 63</span>
+          <div class="age-bar-track"><div class="age-bar-fill bar-legacy" style="width:100%"></div></div>
+          <span class="age-bar-val">Legacy</span>
+        </div>
+        <div class="age-bar-row" style="margin-top:10px;padding-top:12px;border-top:1px solid var(--border);">
+          <span class="age-bar-label" style="color:var(--green);">Eternity at 33</span>
+          <div class="age-bar-track" style="background:var(--green-light);">
+            <div class="age-bar-fill bar-eternity" style="width:100%;"></div>
+          </div>
+          <span class="age-bar-val bar-eternity-val">∞</span>
+        </div>
+      </div>
+      <p class="jannah-caption">Al-Ghazālī began writing the <em>Iḥyāʾ</em> after leaving Baghdad near 40. His formation began decades earlier — as does yours.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ─── SCHOLARS ─── -->
+<section class="container" id="archive">
+  <span class="eyebrow">What the tradition says</span>
+  <h2 class="section-title">On the purposeful life</h2>
+  <div class="scholar-grid">
+    <div class="scholar-card">
+      <p class="scholar-quote">"A trait of character is a firmly established condition of the soul, from which actions proceed easily without any need for thinking or forethought."</p>
+      <p class="scholar-name">Al-Ghazālī</p>
+      <p class="scholar-note">Iḥyāʾ ʿUlūm al-Dīn, Book XXII — defining khulūq. Character is not occasional effort; it is what you have become.</p>
+    </div>
+    <div class="scholar-card">
+      <p class="scholar-quote">"Activism will only succeed when it remembers that history is in good hands."</p>
+      <p class="scholar-name">Abdal-Hakim Murad</p>
+      <p class="scholar-note">Contentions, §1 — tawakkul is not passivity. It is the theological foundation that makes sustained action possible without burning out.</p>
+    </div>
+    <div class="scholar-card">
+      <p class="scholar-quote">"The people of this ummah have lifespans between sixty and seventy years, and few of them exceed that."</p>
+      <p class="scholar-name">The Prophet ﷺ</p>
+      <p class="scholar-note">Tirmidhi, Sunan — the hadith is not morbid. It is a calibration tool. You are not immortal. The question is what you do with that.</p>
+    </div>
+    <div class="scholar-card">
+      <p class="scholar-quote">"Whosoever is granted wisdom has truly been granted abundant good."</p>
+      <p class="scholar-name">Quran 2:269</p>
+      <p class="scholar-note">Al-Ghazālī reads this as the first fundamental virtue — Wisdom (hikma) — preceding Courage, Temperance, and Justice. Career without wisdom is just motion.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ─── READING NOW ─── -->
+<section class="container">
+  <span class="eyebrow">Currently in the reading pile</span>
+  <h2 class="section-title">What we are sitting with</h2>
+  <p class="section-sub">Thirty-Three is a newsletter built from actual reading, not content strategy. Here is what is shaping the current issue.</p>
+  <div class="reading-grid">
+    <div class="book-card">
+      <span class="book-tag">Islamic ethics</span>
+      <p class="book-title">Breaking the Two Desires</p>
+      <p class="book-author">Al-Ghazālī — Iḥyāʾ, Book XXII</p>
+      <p class="book-reflection">"Good character is not what you do under effort — it is what flows from you without thinking." Four fundamentals: Wisdom, Courage, Temperance, Justice. We are mapping these onto career decisions.</p>
+    </div>
+    <div class="book-card">
+      <span class="book-tag">Contention</span>
+      <p class="book-title">Contentions</p>
+      <p class="book-author">Abdal-Hakim Murad</p>
+      <p class="book-reflection">"Postmodernism is Jāhiliyya — each tribe has its own story." The diagnosis of a world that has dissolved shared meaning. Thirty-Three is one answer to that.</p>
+    </div>
+    <div class="book-card">
+      <span class="book-tag">Career &amp; purpose</span>
+      <p class="book-title">80,000 Hours</p>
+      <p class="book-author">Benjamin Todd</p>
+      <p class="book-reflection">The secular answer to the purposeful career. We are in conversation with it — inheriting the rigour, reorienting the metaphysics. You have 25,000 days, not just a career.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ─── BOTTOM CTA ─── -->
+<section class="newsletter-bottom" id="subscribe">
+  <span class="nl-eyebrow">Join the reading</span>
+  <h2 class="nl-title">One letter, once a week.<br>The slow kind.</h2>
+  <p class="nl-sub">Reflections on character, career, and the long game — drawn from Islamic scholarship, lived practice, and the best of what serious thinkers are writing. For Muslim professionals who want more than productivity advice.</p>
+
+  <!-- BOTTOM SUBSCRIBE FORM -->
+  <div class="subscribe-form" id="bottom-form">
+    <div class="form-row">
+      <input class="field-name-dark"  type="text"  id="bottom-name"  placeholder="Your name"    autocomplete="given-name" aria-label="First name">
+      <input class="field-email-dark" type="email" id="bottom-email" placeholder="your@email.com" autocomplete="email"    aria-label="Email address">
+      <button class="btn-subscribe-dark" id="bottom-btn" onclick="handleSubscribe('bottom')">Subscribe</button>
+    </div>
+  </div>
+  <div class="form-status-dark" id="bottom-status"></div>
+  <p class="form-note" style="color:#5a5248;margin-top:14px;">Free · No spam · Unsubscribe anytime</p>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-logo">ThirtyThree</div>
+  <div class="footer-note">A newsletter for Muslim professionals · Est. 2026</div>
+</footer>
+
+<!-- ─── SCRIPTS ─── -->
+<script>
+/* ── CONFIG ── change this to your worker URL ── */
+const WORKER_URL = 'https://flat-haze-25a0.shalomshafa.workers.dev/';
+
+/* ── LIFE GRID ── */
+(function() {
+  const slider  = document.getElementById('age-slider');
+  const display = document.getElementById('age-display');
+  const dotsEl  = document.getElementById('life-dots');
+  const noteEl  = document.getElementById('grid-note');
+  const PROPHET = 63, ETERNITY = 14;
+
+  function render(age) {
+    display.textContent = age + ' years';
+    dotsEl.innerHTML = '';
+    for (let i = 1; i <= PROPHET; i++) {
+      const d = document.createElement('span');
+      d.className = 'dot ' + (i < age ? 'used' : i === age ? 'now' : 'remain');
+      d.title = 'Year ' + i;
+      dotsEl.appendChild(d);
+    }
+    for (let i = 0; i < ETERNITY; i++) {
+      const d = document.createElement('span');
+      d.className = 'dot eternity';
+      d.title = i === 0 ? 'Eternity begins →' : '∞';
+      dotsEl.appendChild(d);
+    }
+    const remain = PROPHET - age;
+    const pct    = Math.round((age / PROPHET) * 100);
+    const to33   = age < 33
+      ? (33 - age) + ' years until thirty-three.'
+      : age === 33
+        ? 'You are at thirty-three.'
+        : 'You have passed thirty-three by ' + (age - 33) + ' years.';
+    noteEl.textContent = 'At ' + age + ', you are ' + pct + '% through the Prophetic lifespan — with '
+      + remain + ' years remaining to 63. ' + to33
+      + ' The people of Paradise are thirty-three, forever.';
+  }
+
+  slider.addEventListener('input', () => render(parseInt(slider.value)));
+  render(30);
+})();
+
+/* ── SUBSCRIBE HANDLER ── */
+async function handleSubscribe(formId) {
+  const isHero   = formId === 'hero';
+  const nameEl   = document.getElementById(isHero ? 'hero-name'  : 'bottom-name');
+  const emailEl  = document.getElementById(isHero ? 'hero-email' : 'bottom-email');
+  const btnEl    = document.getElementById(isHero ? 'hero-btn'   : 'bottom-btn');
+  const statusEl = document.getElementById(isHero ? 'hero-status': 'bottom-status');
+
+  const name  = nameEl.value.trim();
+  const email = emailEl.value.trim();
+
+  /* basic validation */
+  if (!name) {
+    setStatus(statusEl, 'error', 'Please enter your name.');
+    nameEl.focus();
+    return;
+  }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    setStatus(statusEl, 'error', 'Please enter a valid email address.');
+    emailEl.focus();
+    return;
+  }
+
+  btnEl.disabled = true;
+  setStatus(statusEl, 'loading', 'One moment…');
+
+  try {
+    /* Step 1 — add to Brevo list (triggers automation in Brevo) */
+    const subRes = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'subscribe_newsletter',
+        list: 'thirtythree',
+        user_name: name,
+        user_email: email
+      })
+    });
+
+    if (!subRes.ok) {
+      const err = await subRes.json().catch(() => ({}));
+      throw new Error(err.message || 'Subscription failed');
+    }
+
+    /* Step 2 — send welcome email immediately via Brevo transactional */
+    await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'send_email',
+        items_purchased: 'thirtythree_welcome',
+        user_name: name,
+        user_email: email
+      })
+    });
+    /* we don't block on welcome email failure — subscription already succeeded */
+
+    setStatus(statusEl, 'success', '✓ You\'re in. Welcome to the reading.');
+    nameEl.value  = '';
+    emailEl.value = '';
+
+  } catch (err) {
+    console.error('Subscribe error:', err);
+    setStatus(statusEl, 'error', err.message || 'Something went wrong. Please try again.');
+    btnEl.disabled = false;
+  }
+}
+
+function setStatus(el, type, msg) {
+  el.textContent = msg;
+  el.className = el.className.replace(/\b(success|error|loading)\b/g, '').trim();
+  el.classList.add(type);
+}
+</script>
+
+</body>
+</html>

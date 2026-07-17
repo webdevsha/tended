@@ -63,6 +63,10 @@ GET  {SUPABASE_URL}/rest/v1/time_blocks?block_date=gte.2026-06-29&is_work=eq.tru
 ```
 Headers on every call: `apikey: <anon-key>` and `Authorization: Bearer <anon-key>`.
 
+## Log
+
+- **2026-07-03** — Journal entries now render markdown (headings, bold/italic, bullets) instead of showing raw asterisks/hashes — fixes Hermes-synced Apple Notes (Yayday) entries displaying literally. Entries are collapsible (`<details>`), with the 3 most recent open by default and the rest collapsed; the list shows the top 3 with a "Load more" button for older entries.
+
 ## What's deliberately NOT in the MVP
 
 - GCal auto-import (Module 2 v2 — manual + Hermes logging first; the ICS import slot is stubbed in Settings)

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice {{INVOICE_NUMBER}} — {{BUSINESS_NAME}}</title>
+
+<!--
+  TENDED.TODAY — INVOICE TEMPLATE
+  ================================
+  Edit the "EDITABLE BUSINESS DETAILS" block below (business name, address,
+  email, payment/bank info, footer note) — those changes apply to every
+  invoice generated from now on. Everything wrapped in {{double_braces}}
+  is filled in automatically per-invoice by index.html; leave those alone.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --ink: #1c1917;
+  --ink-2: #57534e;
+  --ink-3: #a8a29e;
+  --paper: #fcfbf9;
+  --paper-2: #f5f4f0;
+  --border: rgba(28,25,23,0.1);
+  --border-s: rgba(28,25,23,0.22);
+  --accent: #b45309;
+  --accent-l: #fef3c7;
+  --accent-soft: #fbf7ee;
+  --dark-gold: #78350f;
+  --danger: #9b2c2c;
+  --success: #1b4332;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background-color: #e7e5e4;
+  color: var(--ink);
+  line-height: 1.6;
+  font-size: 14px;
+  padding: 40px 0;
+}
+.ebook-container { max-width: 840px; margin: 0 auto; padding: 0 20px; }
+
+.control-panel {
+  background: white;
+  border: 1px solid var(--border-s);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.control-title { font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); }
+.control-desc { font-size: 13px; color: var(--ink-2); margin-top: 4px; }
+.print-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+.print-btn:hover { opacity: 0.9; }
+
+.page {
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  padding: 60px 70px;
+  margin-bottom: 40px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+  min-height: 1060px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--ink); }
+
+/* ---- Invoice header ---- */
+.inv-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
+.biz-name { font-size: 26px; }
+.biz-tagline { font-size: 12px; color: var(--ink-2); margin-top: 4px; }
+.biz-meta { font-size: 12px; color: var(--ink-3); margin-top: 10px; line-height: 1.7; }
+.inv-title { text-align: right; }
+.inv-title h1 { font-size: 34px; letter-spacing: 0.02em; }
+.inv-number { font-size: 13px; color: var(--accent); font-weight: 700; margin-top: 6px; }
+.inv-status {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: var(--accent-l);
+  color: var(--dark-gold);
+}
+.inv-status.paid { background: #d1e7dd; color: var(--success); }
+.inv-status.overdue, .inv-status.void { background: #f4d4d4; color: var(--danger); }
+
+/* ---- Bill-to / dates row ---- */
+.inv-meta-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 20px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 0;
+  margin-bottom: 30px;
+}
+.meta-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); margin-bottom: 6px; }
+.meta-value { font-size: 14px; color: var(--ink); font-weight: 500; }
+.meta-value.bill-to-name { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; }
+
+/* ---- Line items table ---- */
+.line-items { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+.line-items th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+  border-bottom: 1.5px solid var(--border-s);
+  padding: 0 0 10px;
+}
+.line-items th.num, .line-items td.num { text-align: right; }
+.line-items td { padding: 16px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+.line-items .item-desc { font-weight: 500; color: var(--ink); }
+.line-items .item-sub { font-size: 12px; color: var(--ink-3); margin-top: 3px; }
+
+/* ---- Totals ---- */
+.totals { margin-left: auto; width: 280px; margin-top: 10px; }
+.totals-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; color: var(--ink-2); }
+.totals-row.grand {
+  border-top: 1.5px solid var(--border-s);
+  margin-top: 6px;
+  padding-top: 14px;
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.totals-row.grand .num { color: var(--accent); }
+
+/* ---- Notes / payment ---- */
+.inv-notes { margin-top: 40px; }
+.inv-notes h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); margin-bottom: 8px; }
+.inv-notes p { font-size: 13px; color: var(--ink-2); line-height: 1.6; }
+.spiritual-box {
+  background: var(--accent-soft);
+  border: 1px solid rgba(180, 83, 9, 0.15);
+  padding: 18px 20px;
+  border-radius: 8px;
+  margin-top: 30px;
+}
+.spiritual-box p { font-size: 12.5px; font-style: italic; color: var(--ink-2); margin: 0; }
+
+.footer-meta {
+  font-size: 11px;
+  color: var(--ink-3);
+  border-top: 0.5px solid var(--border);
+  padding-top: 12px;
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+@media print {
+  body { background: white; padding: 0; color: #000; }
+  .control-panel { display: none !important; }
+  .page {
+    border: none !important;
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+    box-shadow: none !important;
+    min-height: 100vh;
+  }
+  @page { size: A4; margin: 18mm; }
+}
+
+@media (max-width: 600px) {
+  body { padding: 10px 0; }
+  .page { padding: 30px 20px; min-height: auto; }
+  .inv-top { flex-direction: column; gap: 20px; }
+  .inv-title { text-align: left; }
+  .inv-meta-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="ebook-container">
+
+  <div class="control-panel">
+    <div>
+      <div class="control-title">🖨️ Print / Save as PDF</div>
+      <div class="control-desc">This invoice is formatted to fit one A4 page. Use the button to print it or save it directly as a PDF.</div>
+    </div>
+    <button class="print-btn" onclick="window.print()">
+      <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+        <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
+      </svg>
+      Print / Save as PDF
+    </button>
+  </div>
+
+  <!-- ============================================================
+       EDITABLE BUSINESS DETAILS — change these once, applied to
+       every invoice rendered from this template.
+       ============================================================ -->
+  <div class="page">
+    <div>
+      <div class="inv-top">
+        <div>
+          <div class="biz-name">Tended.Today</div>
+          <div class="biz-tagline">Company of One — Research, Education &amp; Consulting</div>
+          <div class="biz-meta">
+            Sha Fira · hello@tended.today<br>
+            shafiranoh.com
+          </div>
+        </div>
+        <div class="inv-title">
+          <h1>Invoice</h1>
+          <div class="inv-number">{{INVOICE_NUMBER}}</div>
+          <div class="inv-status {{STATUS_CLASS}}">{{STATUS}}</div>
+        </div>
+      </div>
+      <!-- ============================================================
+           END EDITABLE BUSINESS DETAILS
+           ============================================================ -->
+
+      <div class="inv-meta-grid">
+        <div>
+          <div class="meta-label">Billed to</div>
+          <div class="meta-value bill-to-name">{{CLIENT_NAME}}</div>
+        </div>
+        <div>
+          <div class="meta-label">Issue date</div>
+          <div class="meta-value">{{ISSUE_DATE}}</div>
+        </div>
+        <div>
+          <div class="meta-label">Due date</div>
+          <div class="meta-value">{{DUE_DATE}}</div>
+        </div>
+      </div>
+
+      <table class="line-items">
+        <thead>
+          <tr><th>Date</th><th>Description</th><th class="num">Hours</th><th class="num">Rate</th><th class="num">Amount</th></tr>
+        </thead>
+        <tbody>
+          {{LINE_ITEMS_ROWS}}
+        </tbody>
+      </table>
+
+      <div class="totals">
+        <div class="totals-row grand"><span>Total due</span><span class="num">{{AMOUNT}}</span></div>
+      </div>
+
+      <div class="inv-notes">
+        <h4>Payment details</h4>
+        <p>
+          Bank transfer to: <strong>Sha Fira</strong> · Maybank · 1234 5678 9012<br>
+          Please use <strong>{{INVOICE_NUMBER}}</strong> as the payment reference.
+        </p>
+      </div>
+
+      <div class="spiritual-box">
+        <p>"Whoever seeks halal sustenance is like one who strives in the way of Allah." Thank you for the trust — every invoice here is tended to with care.</p>
+      </div>
+    </div>
+
+    <div class="footer-meta">
+      <span>Tended.Today · shafiranoh.com</span>
+      <span>Generated {{ISSUE_DATE}}</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

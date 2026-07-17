@@ -49,8 +49,13 @@ create table if not exists invoices (
   status text not null default 'draft'
     check (status in ('draft','sent','paid','overdue','void')),
   created_by text not null default 'sha',
-  created_at timestamptz default now()
+  created_at timestamptz default now(),
+  line_items jsonb not null default '[]'::jsonb
+  -- each item: {date, description, hours, rate, amount} — e.g. one row per class taught
 );
+
+-- Migration for existing projects created before line_items existed:
+-- alter table invoices add column if not exists line_items jsonb not null default '[]'::jsonb;
 
 -- ---------- MODULE 2 · TIME ----------
 
@@ -79,6 +84,7 @@ create table if not exists journal_entries (
 create table if not exists weekly_reviews (
   id uuid primary key default gen_random_uuid(),
   week_start date not null unique,
+  content text,                           -- full reflection text (Hermes weekly reflection)
   wins text,
   stuck text,
   irori_hours numeric(5,1) default 0,
@@ -87,12 +93,30 @@ create table if not exists weekly_reviews (
   created_at timestamptz default now()
 );
 
+-- Migration for existing projects created before content existed:
+-- alter table weekly_reviews add column if not exists content text;
+
 create table if not exists plc_log (
   id uuid primary key default gen_random_uuid(),
   log_date date not null default current_date,
   kind text not null check (kind in ('quran','highlight','other')),
   detail text not null,
   created_at timestamptz default now()
+);
+
+-- ---------- MODULE 3 · SCORECARD (Founder Velocity, adapted) ----------
+-- Count-based, not subjective-score-based — see scorecard-faculty-cxo-mapping.md.
+-- RIZQ is the only metric live for now; growth_now here is a count/coverage
+-- number (e.g. touchpoints, entries), never a 0-10 judgment score.
+
+create table if not exists scorecard_scores (
+  id uuid primary key default gen_random_uuid(),
+  week_start date not null,
+  metric text not null,                   -- 'RIZQ' | 'PROFIT' | 'CASH' | ... (see mapping doc)
+  growth_now numeric(10,2),
+  note text,
+  created_at timestamptz default now(),
+  unique (week_start, metric)
 );
 
 -- ---------- SECURITY (single-user, anon key) ----------
@@ -108,11 +132,12 @@ alter table time_blocks     enable row level security;
 alter table journal_entries enable row level security;
 alter table weekly_reviews  enable row level security;
 alter table plc_log         enable row level security;
+alter table scorecard_scores enable row level security;
 
 do $$
 declare t text;
 begin
-  foreach t in array array['categories','transactions','invoices','time_blocks','journal_entries','weekly_reviews','plc_log']
+  foreach t in array array['categories','transactions','invoices','time_blocks','journal_entries','weekly_reviews','plc_log','scorecard_scores']
   loop
     execute format('drop policy if exists "anon full access" on %I', t);
     execute format('create policy "anon full access" on %I for all using (true) with check (true)', t);
