@@ -49,7 +49,6 @@ nav button[data-tab="soul"].active::after{background:#86efac}
 nav button[data-tab="body"].active::after{background:#fdba74}
 nav button[data-tab="heart"].active::after{background:#fda4af}
 nav button[data-tab="mind"].active::after{background:#7dd3fc}
-nav button[data-tab="scorecard"].active::after{background:#c4b5fd}
 nav .spacer{flex:1}
 .settings-link{display:flex;align-items:center;gap:.4rem;color:var(--text-light);background:none;border:none;font:inherit;font-size:.875rem;cursor:pointer}
 .settings-link:hover{color:var(--text-dark)}
@@ -294,7 +293,6 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
       <button class="nav-btn" data-tab="body">Body</button>
       <button class="nav-btn" data-tab="heart">Heart</button>
       <button class="nav-btn" data-tab="mind">Mind</button>
-      <button class="nav-btn" data-tab="scorecard">Scorecard</button>
       <div class="spacer"></div>
       <button class="settings-link" onclick="openSettings()">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -313,27 +311,21 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
         <div class="stat-grid" id="dashKpis"><!-- rendered --></div>
 
         <ul class="element-list" id="dashTiles"><!-- rendered --></ul>
-
-        <h3 class="section-h">Weekly Scorecard</h3>
-        <div class="stat-grid" id="dashScorecardCards"><!-- rendered --></div>
       </div>
 
-      <!-- SOUL (gentle static for MVP + Quran Log) -->
+      <!-- SOUL (Intentions log + Quran Log) -->
       <div id="soul" class="tab-content">
         <div class="dashboard-header"><h1>Soul (Ruh)</h1><p>Anchor your purpose before you begin.</p></div>
+        <h3 class="section-h">Scorecard</h3>
+        <div class="stat-grid" id="scorecardSoul"><!-- rendered --></div>
         <div class="sub-nav">
-          <button class="soul-sub active" data-sub="practice" onclick="switchSoulTab('practice')">Practice</button>
+          <button class="soul-sub active" data-sub="intentions" onclick="switchSoulTab('intentions')">Intentions</button>
           <button class="soul-sub" data-sub="quran" onclick="switchSoulTab('quran')">Quran Log</button>
         </div>
 
-        <div id="soul-practice" class="sub-tab-content">
-          <div class="page-intro" style="border-left-color:var(--accent-green)">Today's intention is not volume, but presence. Have you connected with your Source before connecting with your clients? This space stays unmeasured on purpose — <em>rūḥ</em> is not a metric.</div>
-          <div class="checklist">
-            <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Morning Dhikr / Meditation</div>
-            <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Set intention for work (Niyyah)</div>
-            <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Read 5 pages of beneficial knowledge</div>
-            <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;font-size:.9rem"><input type="checkbox"> Silence / nature walk (10 mins)</div>
-          </div>
+        <div id="soul-intentions" class="sub-tab-content">
+          <div class="page-intro" style="border-left-color:var(--accent-green)">Today's intention is not volume, but presence. Have you connected with your Source before connecting with your clients? This space stays unmeasured on purpose — <em>rūḥ</em> is not a metric. Mirrored read-only from your Quran Log sheet.</div>
+          <div id="intentionWrap"><p class="empty-note">Loading…</p></div>
         </div>
 
         <div id="soul-quran" class="sub-tab-content" style="display:none">
@@ -345,6 +337,8 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
       <!-- BODY = Health + MODULE 1 MONEY -->
       <div id="body" class="tab-content">
         <div class="dashboard-header"><h1>Body (Nafs)</h1><p>The vessel and its sustenance.</p></div>
+        <h3 class="section-h">Scorecard</h3>
+        <div class="stat-grid" id="scorecardBody"><!-- rendered --></div>
         <div class="sub-nav">
           <button class="body-sub active" data-sub="sustenance" onclick="switchBodyTab('sustenance')">Sustenance (Money)</button>
           <button class="body-sub" data-sub="invoices" onclick="switchBodyTab('invoices')">Invoices</button>
@@ -421,21 +415,56 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
         </div>
       </div>
 
-      <!-- HEART (gentle static for MVP) -->
+      <!-- HEART (Check-ins + Board of Directors log) -->
       <div id="heart" class="tab-content">
         <div class="dashboard-header"><h1>Heart (Qalb)</h1><p>Tending to relationships and emotions.</p></div>
-        <div class="page-intro" style="border-left-color:var(--accent-rose)">The heart is the general of the body. Who needs your tenderness today? This space also stays soft — connection is witnessed here, not scored.</div>
-        <div class="checklist">
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Weekly Mama practice</div>
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Check in with R — mirror, not manager</div>
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Family time (phone free)</div>
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;font-size:.9rem"><input type="checkbox"> Self-compassion pause — kindness inward first</div>
+        <h3 class="section-h">Scorecard</h3>
+        <div class="stat-grid" id="scorecardHeart"><!-- rendered --></div>
+        <div class="sub-nav">
+          <button class="heart-sub active" data-sub="checkins" onclick="switchHeartTab('checkins')">Check-ins</button>
+          <button class="heart-sub" data-sub="board" onclick="switchHeartTab('board')">Board of Directors</button>
+        </div>
+
+        <div id="heart-checkins" class="sub-tab-content">
+          <div class="page-intro" style="border-left-color:var(--accent-rose)">The heart is the general of the body. Who needs your tenderness today? This space also stays soft — connection is witnessed here, not scored.</div>
+          <div class="checklist">
+            <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Weekly Mama practice</div>
+            <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Check in with R — mirror, not manager</div>
+            <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Family time (phone free)</div>
+            <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;font-size:.9rem"><input type="checkbox"> Self-compassion pause — kindness inward first</div>
+          </div>
+        </div>
+
+        <div id="heart-board" class="sub-tab-content" style="display:none">
+          <div class="page-intro" style="border-left-color:var(--accent-rose)">Gallup's 7-role framework — Coach, Mentor, Role Model, Expert, Accountability Partner, Complementary Partner, Person with Shared Interest. Log the touchpoint; a count and a 0–7 coverage bar, never a relationship score.</div>
+          <div class="form-card">
+            <div class="form-title">Log a touchpoint</div>
+            <div class="form-row">
+              <select id="botRole">
+                <option>Coach</option><option>Mentor</option><option>Role Model</option>
+                <option>Expert</option><option>Accountability Partner</option>
+                <option>Complementary Partner</option><option>Person with Shared Interest</option>
+              </select>
+              <input id="botPerson" placeholder="Person (e.g. Daniel, Sinar Fellowship)">
+              <input id="botDate" type="date">
+            </div>
+            <div class="form-row">
+              <input id="botMinutes" type="number" min="0" step="5" placeholder="Minutes (optional)">
+              <input id="botNote" placeholder="One-line note">
+              <button class="btn btn-primary" onclick="addBoardTouchpoint()">Log</button>
+            </div>
+          </div>
+          <div id="boardCoverageWrap"></div>
+          <h3 class="section-h">This week's touchpoints</h3>
+          <div id="boardTableWrap"></div>
         </div>
       </div>
 
       <!-- MIND = MODULE 2 TIME -->
       <div id="mind" class="tab-content">
         <div class="dashboard-header"><h1>Mind (Aql)</h1><p>Time, deep work, and the Pareto guard.</p></div>
+        <h3 class="section-h">Scorecard</h3>
+        <div class="stat-grid" id="scorecardMind"><!-- rendered --></div>
         <div class="sub-nav">
           <button class="mind-sub active" data-sub="time" onclick="switchMindTab('time')">Time blocks</button>
           <button class="mind-sub" data-sub="journal" onclick="switchMindTab('journal')">Journal</button>
@@ -504,12 +533,6 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
         </div>
       </div>
 
-      <!-- SCORECARD -->
-      <div id="scorecard" class="tab-content">
-        <div class="dashboard-header"><h1>Scorecard</h1><p>Founder Velocity, adapted — counts, not gut-scores.</p></div>
-        <div class="page-intro" style="border-left-color:#c4b5fd">RIZQ is live, sourced straight from your Body ledger. The rest are locked until their turn on the roadmap (<code class="inline">product-roadmap.md</code>) — every one of them will be a count or a log, never a floating 0–10 score. See <code class="inline">scorecard-faculty-cxo-mapping.md</code> for the full mapping to your 4 faculties and CXO roles.</div>
-        <div class="stat-grid" id="scorecardCards"><!-- rendered --></div>
-      </div>
     </main>
 
     <footer>
@@ -638,6 +661,18 @@ create table if not exists scorecard_scores (
   unique (week_start, metric)
 );
 
+-- Board of Directors — Gallup's 7-role framework, Qalb faculty.
+-- A touchpoint count per role, never a relationship score.
+create table if not exists board_touchpoints (
+  id uuid primary key default gen_random_uuid(),
+  touch_date date not null default current_date,
+  role text not null check (role in ('Coach','Mentor','Role Model','Expert','Accountability Partner','Complementary Partner','Person with Shared Interest')),
+  person text not null,
+  minutes int,
+  note text,
+  created_at timestamptz default now()
+);
+
 -- ---------- SECURITY (single-user, anon key) ----------
 -- MVP: RLS enabled with permissive policies for the anon role.
 -- Your anon key is the password to this data — do not publish the
@@ -652,11 +687,12 @@ alter table journal_entries enable row level security;
 alter table weekly_reviews  enable row level security;
 alter table plc_log         enable row level security;
 alter table scorecard_scores enable row level security;
+alter table board_touchpoints enable row level security;
 
 do $$
 declare t text;
 begin
-  foreach t in array array['categories','transactions','invoices','time_blocks','journal_entries','weekly_reviews','plc_log','scorecard_scores']
+  foreach t in array array['categories','transactions','invoices','time_blocks','journal_entries','weekly_reviews','plc_log','scorecard_scores','board_touchpoints']
   loop
     execute format('drop policy if exists "anon full access" on %I', t);
     execute format('create policy "anon full access" on %I for all using (true) with check (true)', t);
@@ -679,7 +715,7 @@ const state = {
   range: 'month',
   floor: Number(store.get('tt_floor') || 10000),
   journalVisibleCount: 3,
-  cache: { transactions:[], invoices:[], time_blocks:[], journal_entries:[], weekly_reviews:[] }
+  cache: { transactions:[], invoices:[], time_blocks:[], journal_entries:[], weekly_reviews:[], board_touchpoints:[] }
 };
 
 const RM = n => 'RM ' + Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -714,7 +750,7 @@ function weekStart(d){ const x=new Date(d); const day=(x.getDay()+6)%7; x.setDat
 /* ═══════════ DATA LAYER ═══════════ */
 const TABLES = {
   transactions:'tx_date', invoices:'issue_date', time_blocks:'block_date',
-  journal_entries:'entry_date', weekly_reviews:'week_start'
+  journal_entries:'entry_date', weekly_reviews:'week_start', board_touchpoints:'touch_date'
 };
 
 const db = {
@@ -997,24 +1033,24 @@ function renderDashboard(){
     </li>`;
 }
 
-/* ═══════════ RENDER: SCORECARD ═══════════ */
-// Count-over-judgment: only RIZQ is live (sourced from transactions). Everything
-// else ships locked until its turn on product-roadmap.md — see
+/* ═══════════ RENDER: SCORECARD (folded into each faculty tab) ═══════════ */
+// Count-over-judgment: RIZQ and Board of Directors are live. Everything else
+// ships locked until its turn on product-roadmap.md — see
 // scorecard-faculty-cxo-mapping.md for why nothing here is a subjective score.
 const SCORECARD_GHOSTS = [
-  {label:'Profit', faculty:'Nafs', roadmap:'N2'},
-  {label:'Cash buffer', faculty:'Nafs', roadmap:'N2'},
-  {label:'Systems Health', faculty:'Nafs', roadmap:'N3'},
-  {label:'Content', faculty:'Qalb', roadmap:'Q3'},
-  {label:'Audience', faculty:'Qalb', roadmap:'Q4'},
-  {label:'Board of Directors', faculty:'Qalb', roadmap:'Q2'},
-  {label:'Product Sprint', faculty:'Aqal', roadmap:'A1'},
-  {label:'Stack Health', faculty:'Aqal', roadmap:'A2'},
-  {label:'Hypothesis Score', faculty:'Aqal', roadmap:'A3'},
-  {label:'Values Alignment', faculty:'Ruh', roadmap:'R4'},
-  {label:'Reflection Depth', faculty:'Ruh', roadmap:'R3'}
+  {label:'Profit', faculty:'body', roadmap:'N2'},
+  {label:'Cash buffer', faculty:'body', roadmap:'N2'},
+  {label:'Systems Health', faculty:'body', roadmap:'N3'},
+  {label:'Content', faculty:'heart', roadmap:'Q3'},
+  {label:'Audience', faculty:'heart', roadmap:'Q4'},
+  {label:'Product Sprint', faculty:'mind', roadmap:'A1'},
+  {label:'Stack Health', faculty:'mind', roadmap:'A2'},
+  {label:'Hypothesis Score', faculty:'mind', roadmap:'A3'},
+  {label:'Values Alignment', faculty:'soul', roadmap:'R4'},
+  {label:'Reflection Depth', faculty:'soul', roadmap:'R3'}
 ];
 const RIZQ_WEEKLY_GOAL = 1375; // RM 5,500/mo ÷ 4 — scorecard-velocity.md Part 3C
+const BOD_ROLES = ['Coach','Mentor','Role Model','Expert','Accountability Partner','Complementary Partner','Person with Shared Interest'];
 
 function scorecardRizqNumbers(){
   const ws = weekStart(new Date());
@@ -1025,29 +1061,63 @@ function scorecardRizqNumbers(){
   return { actual, goal: RIZQ_WEEKLY_GOAL, pct };
 }
 
-function renderScorecardCards(containerId){
-  const el = document.getElementById(containerId);
-  if (!el) return;
+function boardNumbers(){
+  const ws = weekStart(new Date());
+  const rows = state.cache.board_touchpoints.filter(t=>t.touch_date>=ws);
+  return { count: rows.length, coverage: new Set(rows.map(r=>r.role)).size, rows };
+}
+
+function ghostCards(faculty){
+  return SCORECARD_GHOSTS.filter(g=>g.faculty===faculty).map(g=>`
+    <div class="stat-card ghost-card">
+      <div class="stat-label">${esc(g.label)}</div>
+      <div class="stat-val">🔒</div>
+      <div class="stat-sub">Coming soon — roadmap ${esc(g.roadmap)}</div>
+    </div>`).join('');
+}
+
+function renderScorecard(){
   const r = scorecardRizqNumbers();
-  const live = `
+  document.getElementById('scorecardBody').innerHTML = `
     <div class="stat-card">
       <div class="stat-label">RIZQ (Revenue) · this week</div>
       <div class="stat-val metric-good">${RM(r.actual)}</div>
       <div class="progress-track"><div class="progress-fill" style="width:${r.pct}%;background:${r.pct>=100?'#15803d':'#86efac'}"></div></div>
       <div class="stat-sub">${r.pct}% of RM ${r.goal.toLocaleString()} weekly goal</div>
-    </div>`;
-  const ghosts = SCORECARD_GHOSTS.map(g=>`
-    <div class="stat-card ghost-card">
-      <div class="stat-label">${esc(g.label)} · ${esc(g.faculty)}</div>
-      <div class="stat-val">🔒</div>
-      <div class="stat-sub">Coming soon — roadmap ${esc(g.roadmap)}</div>
-    </div>`).join('');
-  el.innerHTML = live + ghosts;
+    </div>` + ghostCards('body');
+
+  const b = boardNumbers();
+  document.getElementById('scorecardHeart').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Board of Directors · touchpoints this week</div>
+      <div class="stat-val metric-good">${b.count}</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${Math.round(b.coverage/7*100)}%;background:#86efac"></div></div>
+      <div class="stat-sub">${b.coverage}/7 roles touched this week</div>
+    </div>` + ghostCards('heart');
+
+  document.getElementById('scorecardMind').innerHTML = ghostCards('mind');
+  document.getElementById('scorecardSoul').innerHTML = ghostCards('soul');
 }
 
-function renderScorecard(){
-  renderScorecardCards('scorecardCards');
-  renderScorecardCards('dashScorecardCards');
+function renderBoard(){
+  const b = boardNumbers();
+  document.getElementById('boardCoverageWrap').innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">Touchpoints this week</div><div class="stat-val metric-good">${b.count}</div></div>
+      <div class="stat-card"><div class="stat-label">Role coverage</div><div class="stat-val">${b.coverage}/7</div>
+        <div class="progress-track"><div class="progress-fill" style="width:${Math.round(b.coverage/7*100)}%;background:#86efac"></div></div></div>
+    </div>`;
+  const rows = state.cache.board_touchpoints;
+  document.getElementById('boardTableWrap').innerHTML = rows.length ? `
+    <table class="data-table"><thead><tr><th>Date</th><th>Role</th><th>Person</th><th>Minutes</th><th>Note</th></tr></thead><tbody>
+    ${rows.map(t=>`<tr>
+      <td>${esc(t.touch_date)}</td>
+      <td><span class="tag">${esc(t.role)}</span></td>
+      <td>${esc(t.person)}</td>
+      <td>${t.minutes??'—'}</td>
+      <td>${esc(t.note||'')}</td>
+    </tr>`).join('')}</tbody></table>`
+    : '<p class="empty-note">No touchpoints logged yet. Log the first one above.</p>';
 }
 
 /* ═══════════ SHEET SYNC: AQL Log + Quran Log (read-only) ═══════════ */
@@ -1100,7 +1170,6 @@ async function loadQuranLog(){
       <div class="journal-card">
         <div class="journal-meta"><strong>Page ${esc(r['Page Number']||'—')}</strong> · ${esc(r['Timestamp']||'')}${r['Session Type']?` · <span class="tag" style="background:#f4f1ea;color:#6b6355">${esc(r['Session Type'])}</span>`:''}</div>
         <div class="journal-body">
-          ${r['Daily Intention']?`<p><strong>Intention:</strong> ${esc(r['Daily Intention'])}</p>`:''}
           ${r['Reflection Notes']?`<p><strong>Reflection:</strong> ${esc(r['Reflection Notes'])}</p>`:''}
         </div>
       </div>`).join('') : '<p class="empty-note">No entries yet.</p>';
@@ -1109,9 +1178,23 @@ async function loadQuranLog(){
   }
 }
 
+async function loadIntentionLog(){
+  const wrap = document.getElementById('intentionWrap');
+  try {
+    const rows = (await fetchSheetCsv(504065786)).reverse().filter(r=>r['Daily Intention']);
+    wrap.innerHTML = rows.length ? rows.map(r=>`
+      <div class="journal-card">
+        <div class="journal-meta">${esc(r['Timestamp']||'')}</div>
+        <div class="journal-body"><p>${esc(r['Daily Intention'])}</p></div>
+      </div>`).join('') : '<p class="empty-note">No intentions logged yet.</p>';
+  } catch(e){
+    wrap.innerHTML = `<p class="empty-note">Could not load intentions (${esc(e.message)}).</p>`;
+  }
+}
+
 function renderAll(){
   renderDashboard(); renderMoney(); renderInvoices(); renderStatements();
-  renderTime(); renderJournal(); renderReviews(); renderScorecard();
+  renderTime(); renderJournal(); renderReviews(); renderScorecard(); renderBoard();
 }
 
 /* ═══════════ ACTIONS ═══════════ */
@@ -1234,6 +1317,21 @@ async function addTimeBlock(){
   renderAll(); toast('Block logged');
 }
 
+async function addBoardTouchpoint(){
+  const person = document.getElementById('botPerson').value.trim();
+  if (!person) return toast('Person needed');
+  const minutes = document.getElementById('botMinutes').value;
+  await db.insert('board_touchpoints',{
+    role: document.getElementById('botRole').value,
+    person,
+    touch_date: document.getElementById('botDate').value || todayISO(),
+    minutes: minutes ? parseInt(minutes) : null,
+    note: document.getElementById('botNote').value || null
+  });
+  document.getElementById('botPerson').value=''; document.getElementById('botMinutes').value=''; document.getElementById('botNote').value='';
+  renderAll(); toast('Touchpoint logged');
+}
+
 async function addJournal(){
   const content = document.getElementById('jContent').value.trim();
   if (!content) return toast('Write something first');
@@ -1273,14 +1371,13 @@ const sectionData = {
   heart:{quote:'"Do not force the rose to open. The sun and the rain will do that work. Your job is only to keep the soil soft."',author:'(Reflections on Tending)',icon:'<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',cls:'heart-mode'},
   mind:{quote:'"Clarity comes from stillness, not speed. A muddy pond clears only when you stop stirring it."',author:'(Mindful Strategy)',icon:'<path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/><path d="M9 21h6"/>',cls:'mind-mode'},
   body:{quote:'"The vessel has rights over you. Sustenance recorded with adab becomes amanah, not anxiety."',author:'(The Rights of the Self)',icon:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',cls:'body-mode'},
-  scorecard:{quote:'"Track the trajectory, don\'t guess the meaning. A count is honest where a gut-score is just a mood."',author:'(Founder Velocity, adapted)',icon:'<path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>',cls:''}
 };
 
 function goTo(tab){ switchTab(tab); }
 function switchTab(tabName){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tabName));
   document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active',c.id===tabName));
-  if (tabName==='scorecard') showIntro('scorecard','A scorecard you can trust','Every metric here is a count or a sum — never a 0–10 gut-score. Only RIZQ is live so far, pulled straight from your Body ledger; the rest unlock on the roadmap. Nothing here decides anything for you — it just counts honestly.');
+  if (tabName==='soul' && !state.intentionLoaded){ state.intentionLoaded = true; loadIntentionLog(); }
   const d = sectionData[tabName], lp=document.getElementById('leftPanel');
   lp.classList.remove('soul-mode','heart-mode','mind-mode','body-mode');
   if (d.cls) lp.classList.add(d.cls);
@@ -1314,12 +1411,24 @@ function switchMindTab(name){
 }
 function switchSoulTab(name){
   document.querySelectorAll('.soul-sub').forEach(b=>b.classList.toggle('active',b.dataset.sub===name));
-  ['practice','quran'].forEach(s=>{
+  ['intentions','quran'].forEach(s=>{
     document.getElementById('soul-'+s).style.display = s===name?'block':'none';
   });
+  if (name==='intentions'){
+    if (!state.intentionLoaded){ state.intentionLoaded = true; loadIntentionLog(); }
+  }
   if (name==='quran'){
-    showIntro('quran','Your Quran Log, mirrored here','This is a read-only view of your daily reading + reflection log — page, intention, and what you noted. Nothing is written back; it\'s here so the record lives alongside your other faculties.');
+    showIntro('quran','Your Quran Log, mirrored here','This is a read-only view of your daily reading + reflection log — page and what you noted. Nothing is written back; it\'s here so the record lives alongside your other faculties.');
     if (!state.quranLoaded){ state.quranLoaded = true; loadQuranLog(); }
+  }
+}
+function switchHeartTab(name){
+  document.querySelectorAll('.heart-sub').forEach(b=>b.classList.toggle('active',b.dataset.sub===name));
+  ['checkins','board'].forEach(s=>{
+    document.getElementById('heart-'+s).style.display = s===name?'block':'none';
+  });
+  if (name==='board'){
+    showIntro('board','Your Board of Directors, tracked','Gallup\'s 7 relationship roles — a touchpoint count and a 0–7 coverage bar. Never a relationship score; only what happened and with whom.');
   }
 }
 function showIntro(key,title,body){
@@ -1394,6 +1503,9 @@ function seedDemo(){
   state.cache.journal_entries=[
     {id:uid(),entry_date:t,title:'Sample Hermes draft',content:'Extracted from Yayday: worksheet #3 shipped, energy steady, luteal-phase pacing respected.',tags:['yayday'],source:'hermes',approved:false}
   ];
+  state.cache.board_touchpoints=[
+    {id:uid(),touch_date:t,role:'Mentor',person:'Sample — Sinar Fellowship advisory sync',minutes:30,note:'Sample touchpoint'}
+  ];
 }
 
 function startDemo(){
@@ -1433,6 +1545,7 @@ function disconnect(){
   document.getElementById('tbDate').value = todayISO();
   document.getElementById('jDate').value = todayISO();
   document.getElementById('liDate').value = todayISO();
+  document.getElementById('botDate').value = todayISO();
   document.getElementById('wrWeek').value = weekStart(new Date());
   renderInvoiceLines();
 
