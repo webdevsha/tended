@@ -104,6 +104,21 @@ create table if not exists plc_log (
   created_at timestamptz default now()
 );
 
+-- ---------- MODULE 3 · SCORECARD (Founder Velocity, adapted) ----------
+-- Count-based, not subjective-score-based — see scorecard-faculty-cxo-mapping.md.
+-- RIZQ is the only metric live for now; growth_now here is a count/coverage
+-- number (e.g. touchpoints, entries), never a 0-10 judgment score.
+
+create table if not exists scorecard_scores (
+  id uuid primary key default gen_random_uuid(),
+  week_start date not null,
+  metric text not null,                   -- 'RIZQ' | 'PROFIT' | 'CASH' | ... (see mapping doc)
+  growth_now numeric(10,2),
+  note text,
+  created_at timestamptz default now(),
+  unique (week_start, metric)
+);
+
 -- ---------- SECURITY (single-user, anon key) ----------
 -- MVP: RLS enabled with permissive policies for the anon role.
 -- Your anon key is the password to this data — do not publish the
@@ -117,11 +132,12 @@ alter table time_blocks     enable row level security;
 alter table journal_entries enable row level security;
 alter table weekly_reviews  enable row level security;
 alter table plc_log         enable row level security;
+alter table scorecard_scores enable row level security;
 
 do $$
 declare t text;
 begin
-  foreach t in array array['categories','transactions','invoices','time_blocks','journal_entries','weekly_reviews','plc_log']
+  foreach t in array array['categories','transactions','invoices','time_blocks','journal_entries','weekly_reviews','plc_log','scorecard_scores']
   loop
     execute format('drop policy if exists "anon full access" on %I', t);
     execute format('create policy "anon full access" on %I for all using (true) with check (true)', t);

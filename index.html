@@ -49,6 +49,7 @@ nav button[data-tab="soul"].active::after{background:#86efac}
 nav button[data-tab="body"].active::after{background:#fdba74}
 nav button[data-tab="heart"].active::after{background:#fda4af}
 nav button[data-tab="mind"].active::after{background:#7dd3fc}
+nav button[data-tab="scorecard"].active::after{background:#c4b5fd}
 nav .spacer{flex:1}
 .settings-link{display:flex;align-items:center;gap:.4rem;color:var(--text-light);background:none;border:none;font:inherit;font-size:.875rem;cursor:pointer}
 .settings-link:hover{color:var(--text-dark)}
@@ -64,6 +65,9 @@ main::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:10px}
 .sub-nav button:hover{background:rgba(0,0,0,.02);color:var(--text-dark)}
 .sub-nav button.active{background:var(--accent-orange);color:#9a3412;font-weight:600}
 #mind .sub-nav button.active{background:var(--accent-blue);color:#0369a1}
+#soul .sub-nav button.active{background:var(--accent-green);color:#166534}
+.ghost-card{opacity:.55}
+.ghost-card .stat-val{font-size:1.4rem}
 .sub-tab-content{animation:fadeIn .4s ease-out}
 
 .dashboard-header{margin-bottom:1.5rem}
@@ -256,6 +260,15 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
   </div>
 </div>
 
+<!-- ═══════════ FEATURE INTRO (onboarding-popup convention) ═══════════ -->
+<div class="overlay hidden" id="introOverlay">
+  <div class="onboard" style="padding:1.75rem;width:440px">
+    <h2 id="introTitle">—</h2>
+    <p class="sub" id="introBody">—</p>
+    <div class="ob-footer"><button class="btn btn-primary" onclick="closeIntro()">Got it</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- ═══════════ APP ═══════════ -->
@@ -281,6 +294,7 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
       <button class="nav-btn" data-tab="body">Body</button>
       <button class="nav-btn" data-tab="heart">Heart</button>
       <button class="nav-btn" data-tab="mind">Mind</button>
+      <button class="nav-btn" data-tab="scorecard">Scorecard</button>
       <div class="spacer"></div>
       <button class="settings-link" onclick="openSettings()">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -299,17 +313,32 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
         <div class="stat-grid" id="dashKpis"><!-- rendered --></div>
 
         <ul class="element-list" id="dashTiles"><!-- rendered --></ul>
+
+        <h3 class="section-h">Weekly Scorecard</h3>
+        <div class="stat-grid" id="dashScorecardCards"><!-- rendered --></div>
       </div>
 
-      <!-- SOUL (gentle static for MVP) -->
+      <!-- SOUL (gentle static for MVP + Quran Log) -->
       <div id="soul" class="tab-content">
         <div class="dashboard-header"><h1>Soul (Ruh)</h1><p>Anchor your purpose before you begin.</p></div>
-        <div class="page-intro" style="border-left-color:var(--accent-green)">Today's intention is not volume, but presence. Have you connected with your Source before connecting with your clients? This space stays unmeasured on purpose — <em>rūḥ</em> is not a metric.</div>
-        <div class="checklist">
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Morning Dhikr / Meditation</div>
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Set intention for work (Niyyah)</div>
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Read 5 pages of beneficial knowledge</div>
-          <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;font-size:.9rem"><input type="checkbox"> Silence / nature walk (10 mins)</div>
+        <div class="sub-nav">
+          <button class="soul-sub active" data-sub="practice" onclick="switchSoulTab('practice')">Practice</button>
+          <button class="soul-sub" data-sub="quran" onclick="switchSoulTab('quran')">Quran Log</button>
+        </div>
+
+        <div id="soul-practice" class="sub-tab-content">
+          <div class="page-intro" style="border-left-color:var(--accent-green)">Today's intention is not volume, but presence. Have you connected with your Source before connecting with your clients? This space stays unmeasured on purpose — <em>rūḥ</em> is not a metric.</div>
+          <div class="checklist">
+            <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Morning Dhikr / Meditation</div>
+            <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Set intention for work (Niyyah)</div>
+            <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem"><input type="checkbox"> Read 5 pages of beneficial knowledge</div>
+            <div class="check-item" style="display:flex;gap:.75rem;padding:.5rem 0;font-size:.9rem"><input type="checkbox"> Silence / nature walk (10 mins)</div>
+          </div>
+        </div>
+
+        <div id="soul-quran" class="sub-tab-content" style="display:none">
+          <div class="page-intro" style="border-left-color:var(--accent-green)">A read-only mirror of your daily Quran reading + reflection log. Hermes surfaces the entries; the <em>ma'rifah</em> stays yours.</div>
+          <div id="quranWrap"><p class="empty-note">Loading…</p></div>
         </div>
       </div>
 
@@ -411,6 +440,7 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
           <button class="mind-sub active" data-sub="time" onclick="switchMindTab('time')">Time blocks</button>
           <button class="mind-sub" data-sub="journal" onclick="switchMindTab('journal')">Journal</button>
           <button class="mind-sub" data-sub="review" onclick="switchMindTab('review')">Weekly review</button>
+          <button class="mind-sub" data-sub="aql" onclick="switchMindTab('aql')">AQL Log</button>
         </div>
 
         <!-- Time blocks -->
@@ -466,6 +496,19 @@ footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-ligh
           </div>
           <div id="reviewWrap"></div>
         </div>
+
+        <!-- AQL Log -->
+        <div id="mind-aql" class="sub-tab-content" style="display:none">
+          <div class="page-intro" style="border-left-color:var(--accent-blue)">A read-only mirror of your highlights log (wisdom / technical / beaute / idea). Hermes surfaces the pattern — never the insight.</div>
+          <div id="aqlWrap"><p class="empty-note">Loading…</p></div>
+        </div>
+      </div>
+
+      <!-- SCORECARD -->
+      <div id="scorecard" class="tab-content">
+        <div class="dashboard-header"><h1>Scorecard</h1><p>Founder Velocity, adapted — counts, not gut-scores.</p></div>
+        <div class="page-intro" style="border-left-color:#c4b5fd">RIZQ is live, sourced straight from your Body ledger. The rest are locked until their turn on the roadmap (<code class="inline">product-roadmap.md</code>) — every one of them will be a count or a log, never a floating 0–10 score. See <code class="inline">scorecard-faculty-cxo-mapping.md</code> for the full mapping to your 4 faculties and CXO roles.</div>
+        <div class="stat-grid" id="scorecardCards"><!-- rendered --></div>
       </div>
     </main>
 
@@ -582,6 +625,19 @@ create table if not exists plc_log (
   created_at timestamptz default now()
 );
 
+-- ---------- MODULE 3 · SCORECARD (Founder Velocity, adapted) ----------
+-- Count-based, not subjective-score-based — see scorecard-faculty-cxo-mapping.md.
+
+create table if not exists scorecard_scores (
+  id uuid primary key default gen_random_uuid(),
+  week_start date not null,
+  metric text not null,
+  growth_now numeric(10,2),
+  note text,
+  created_at timestamptz default now(),
+  unique (week_start, metric)
+);
+
 -- ---------- SECURITY (single-user, anon key) ----------
 -- MVP: RLS enabled with permissive policies for the anon role.
 -- Your anon key is the password to this data — do not publish the
@@ -595,11 +651,12 @@ alter table time_blocks     enable row level security;
 alter table journal_entries enable row level security;
 alter table weekly_reviews  enable row level security;
 alter table plc_log         enable row level security;
+alter table scorecard_scores enable row level security;
 
 do $$
 declare t text;
 begin
-  foreach t in array array['categories','transactions','invoices','time_blocks','journal_entries','weekly_reviews','plc_log']
+  foreach t in array array['categories','transactions','invoices','time_blocks','journal_entries','weekly_reviews','plc_log','scorecard_scores']
   loop
     execute format('drop policy if exists "anon full access" on %I', t);
     execute format('create policy "anon full access" on %I for all using (true) with check (true)', t);
@@ -940,9 +997,121 @@ function renderDashboard(){
     </li>`;
 }
 
+/* ═══════════ RENDER: SCORECARD ═══════════ */
+// Count-over-judgment: only RIZQ is live (sourced from transactions). Everything
+// else ships locked until its turn on product-roadmap.md — see
+// scorecard-faculty-cxo-mapping.md for why nothing here is a subjective score.
+const SCORECARD_GHOSTS = [
+  {label:'Profit', faculty:'Nafs', roadmap:'N2'},
+  {label:'Cash buffer', faculty:'Nafs', roadmap:'N2'},
+  {label:'Systems Health', faculty:'Nafs', roadmap:'N3'},
+  {label:'Content', faculty:'Qalb', roadmap:'Q3'},
+  {label:'Audience', faculty:'Qalb', roadmap:'Q4'},
+  {label:'Board of Directors', faculty:'Qalb', roadmap:'Q2'},
+  {label:'Product Sprint', faculty:'Aqal', roadmap:'A1'},
+  {label:'Stack Health', faculty:'Aqal', roadmap:'A2'},
+  {label:'Hypothesis Score', faculty:'Aqal', roadmap:'A3'},
+  {label:'Values Alignment', faculty:'Ruh', roadmap:'R4'},
+  {label:'Reflection Depth', faculty:'Ruh', roadmap:'R3'}
+];
+const RIZQ_WEEKLY_GOAL = 1375; // RM 5,500/mo ÷ 4 — scorecard-velocity.md Part 3C
+
+function scorecardRizqNumbers(){
+  const ws = weekStart(new Date());
+  const actual = state.cache.transactions
+    .filter(t=>t.kind==='income' && t.tx_date>=ws)
+    .reduce((s,t)=>s+Number(t.amount),0);
+  const pct = RIZQ_WEEKLY_GOAL ? Math.min(100, Math.round(actual/RIZQ_WEEKLY_GOAL*100)) : 0;
+  return { actual, goal: RIZQ_WEEKLY_GOAL, pct };
+}
+
+function renderScorecardCards(containerId){
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const r = scorecardRizqNumbers();
+  const live = `
+    <div class="stat-card">
+      <div class="stat-label">RIZQ (Revenue) · this week</div>
+      <div class="stat-val metric-good">${RM(r.actual)}</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${r.pct}%;background:${r.pct>=100?'#15803d':'#86efac'}"></div></div>
+      <div class="stat-sub">${r.pct}% of RM ${r.goal.toLocaleString()} weekly goal</div>
+    </div>`;
+  const ghosts = SCORECARD_GHOSTS.map(g=>`
+    <div class="stat-card ghost-card">
+      <div class="stat-label">${esc(g.label)} · ${esc(g.faculty)}</div>
+      <div class="stat-val">🔒</div>
+      <div class="stat-sub">Coming soon — roadmap ${esc(g.roadmap)}</div>
+    </div>`).join('');
+  el.innerHTML = live + ghosts;
+}
+
+function renderScorecard(){
+  renderScorecardCards('scorecardCards');
+  renderScorecardCards('dashScorecardCards');
+}
+
+/* ═══════════ SHEET SYNC: AQL Log + Quran Log (read-only) ═══════════ */
+const SHEET_ID = '1Sya0_yzNiwITMAMlqcqP7KwY3jmHGZaPBJikFZrcyI8';
+function parseCsv(text){
+  const rows=[]; let row=[]; let field=''; let inQuotes=false;
+  for (let i=0;i<text.length;i++){
+    const c=text[i];
+    if (inQuotes){
+      if (c==='"'){ if (text[i+1]==='"'){ field+='"'; i++; } else inQuotes=false; }
+      else field+=c;
+    } else if (c==='"'){ inQuotes=true; }
+    else if (c===','){ row.push(field); field=''; }
+    else if (c==='\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+    else if (c!=='\r'){ field+=c; }
+  }
+  if (field.length || row.length){ row.push(field); rows.push(row); }
+  return rows;
+}
+async function fetchSheetCsv(gid){
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('HTTP '+res.status);
+  const rows = parseCsv(await res.text());
+  const header = (rows[0]||[]).map(h=>h.trim());
+  return rows.slice(1)
+    .filter(r=>r.some(c=>c!==''))
+    .map(r=>Object.fromEntries(header.map((h,i)=>[h,(r[i]||'').trim()])));
+}
+
+async function loadAqlLog(){
+  const wrap = document.getElementById('aqlWrap');
+  try {
+    const rows = (await fetchSheetCsv(0)).reverse();
+    wrap.innerHTML = rows.length ? rows.map(r=>`
+      <div class="journal-card">
+        <div class="journal-meta"><strong>${esc(r.tag||'note')}</strong> · ${esc(r.date||'')}${r.url?` · <a href="${esc(r.url)}" target="_blank" rel="noopener">source</a>`:''}</div>
+        <div class="journal-body"><p>${esc(r.text||'')}</p>${r.note?`<p><em>${esc(r.note)}</em></p>`:''}</div>
+      </div>`).join('') : '<p class="empty-note">No entries yet.</p>';
+  } catch(e){
+    wrap.innerHTML = `<p class="empty-note">Could not load the AQL log (${esc(e.message)}). If this is a CORS error in your browser, see product-roadmap.md for the server-side proxy fallback.</p>`;
+  }
+}
+
+async function loadQuranLog(){
+  const wrap = document.getElementById('quranWrap');
+  try {
+    const rows = (await fetchSheetCsv(504065786)).reverse();
+    wrap.innerHTML = rows.length ? rows.map(r=>`
+      <div class="journal-card">
+        <div class="journal-meta"><strong>Page ${esc(r['Page Number']||'—')}</strong> · ${esc(r['Timestamp']||'')}${r['Session Type']?` · <span class="tag" style="background:#f4f1ea;color:#6b6355">${esc(r['Session Type'])}</span>`:''}</div>
+        <div class="journal-body">
+          ${r['Daily Intention']?`<p><strong>Intention:</strong> ${esc(r['Daily Intention'])}</p>`:''}
+          ${r['Reflection Notes']?`<p><strong>Reflection:</strong> ${esc(r['Reflection Notes'])}</p>`:''}
+        </div>
+      </div>`).join('') : '<p class="empty-note">No entries yet.</p>';
+  } catch(e){
+    wrap.innerHTML = `<p class="empty-note">Could not load the Quran log (${esc(e.message)}).</p>`;
+  }
+}
+
 function renderAll(){
   renderDashboard(); renderMoney(); renderInvoices(); renderStatements();
-  renderTime(); renderJournal(); renderReviews();
+  renderTime(); renderJournal(); renderReviews(); renderScorecard();
 }
 
 /* ═══════════ ACTIONS ═══════════ */
@@ -1103,13 +1272,15 @@ const sectionData = {
   soul:{quote:'"He who knows himself knows his Lord. The deeper the roots go into the unseen, the higher the branches reach into the sky."',author:'(Al-Ghazali / Sufi Wisdom)',icon:'<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>',cls:'soul-mode'},
   heart:{quote:'"Do not force the rose to open. The sun and the rain will do that work. Your job is only to keep the soil soft."',author:'(Reflections on Tending)',icon:'<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',cls:'heart-mode'},
   mind:{quote:'"Clarity comes from stillness, not speed. A muddy pond clears only when you stop stirring it."',author:'(Mindful Strategy)',icon:'<path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/><path d="M9 21h6"/>',cls:'mind-mode'},
-  body:{quote:'"The vessel has rights over you. Sustenance recorded with adab becomes amanah, not anxiety."',author:'(The Rights of the Self)',icon:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',cls:'body-mode'}
+  body:{quote:'"The vessel has rights over you. Sustenance recorded with adab becomes amanah, not anxiety."',author:'(The Rights of the Self)',icon:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',cls:'body-mode'},
+  scorecard:{quote:'"Track the trajectory, don\'t guess the meaning. A count is honest where a gut-score is just a mood."',author:'(Founder Velocity, adapted)',icon:'<path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>',cls:''}
 };
 
 function goTo(tab){ switchTab(tab); }
 function switchTab(tabName){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tabName));
   document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active',c.id===tabName));
+  if (tabName==='scorecard') showIntro('scorecard','A scorecard you can trust','Every metric here is a count or a sum — never a 0–10 gut-score. Only RIZQ is live so far, pulled straight from your Body ledger; the rest unlock on the roadmap. Nothing here decides anything for you — it just counts honestly.');
   const d = sectionData[tabName], lp=document.getElementById('leftPanel');
   lp.classList.remove('soul-mode','heart-mode','mind-mode','body-mode');
   if (d.cls) lp.classList.add(d.cls);
@@ -1133,9 +1304,34 @@ function switchBodyTab(name){
 }
 function switchMindTab(name){
   document.querySelectorAll('.mind-sub').forEach(b=>b.classList.toggle('active',b.dataset.sub===name));
-  ['time','journal','review'].forEach(s=>{
+  ['time','journal','review','aql'].forEach(s=>{
     document.getElementById('mind-'+s).style.display = s===name?'block':'none';
   });
+  if (name==='aql'){
+    showIntro('aql','A window into what caught your attention','This mirrors your highlights log — passages tagged wisdom, technical, beaute, or idea, with your own notes. It\'s read-only: Hermes surfaces the entries, never what they mean.');
+    if (!state.aqlLoaded){ state.aqlLoaded = true; loadAqlLog(); }
+  }
+}
+function switchSoulTab(name){
+  document.querySelectorAll('.soul-sub').forEach(b=>b.classList.toggle('active',b.dataset.sub===name));
+  ['practice','quran'].forEach(s=>{
+    document.getElementById('soul-'+s).style.display = s===name?'block':'none';
+  });
+  if (name==='quran'){
+    showIntro('quran','Your Quran Log, mirrored here','This is a read-only view of your daily reading + reflection log — page, intention, and what you noted. Nothing is written back; it\'s here so the record lives alongside your other faculties.');
+    if (!state.quranLoaded){ state.quranLoaded = true; loadQuranLog(); }
+  }
+}
+function showIntro(key,title,body){
+  if (store.get('tended_onboarded_'+key)) return;
+  document.getElementById('introTitle').textContent = title;
+  document.getElementById('introBody').textContent = body;
+  state.introKey = key;
+  document.getElementById('introOverlay').classList.remove('hidden');
+}
+function closeIntro(){
+  if (state.introKey) store.set('tended_onboarded_'+state.introKey,'1');
+  document.getElementById('introOverlay').classList.add('hidden');
 }
 function switchTimeframe(range){
   state.range = range;
