@@ -24,7 +24,7 @@ Mind (Aqal — journal) and Body (Nafs — bookkeeping) are fully live with DB p
 
 | # | Product | CXO | Ghost→Live | Why now |
 |---|---|---|---|---|
-| N1 | Scorecard tab: RIZQ live (others ghosted) | CFO | Live | `transactions` table already has the data; cheapest fully-real slice, and `scorecard-velocity.md` flags RIZQ as the most urgent unfilled row |
+| N1 | Scorecard folded into faculty tabs (no standalone tab): RIZQ live in Body, others ghosted | CFO | Live — **re-platformed 2026-07-18** | `transactions` table already has the data; cheapest fully-real slice, and `scorecard-velocity.md` flags RIZQ as the most urgent unfilled row. Originally shipped as its own top-level tab; Sha asked for each metric to live under its owning faculty instead — no more separate Scorecard destination, the cards now render inside Soul/Body/Heart/Mind |
 | N2 | PROFIT + CASH live | CFO | Live | Same table, just expense-subtracted/buffer-tracked; near-zero marginal cost once N1 exists |
 | N3 | SYSTEMS HEALTH count (tasks/energy check-ins) | COO | Ghost→Live | COO's Body Rhythm already described in `cxo-mvp-systems.md`, never counted |
 
@@ -32,8 +32,8 @@ Mind (Aqal — journal) and Body (Nafs — bookkeeping) are fully live with DB p
 
 | # | Product | CXO | Ghost→Live | Why now |
 |---|---|---|---|---|
-| Q1 | Heart checklist → persisted (`heart_log` table) | CSO/CMO | Live | Turns Qalb from decoration into data Hermes can carry forward (`ḥāfiẕa`), without ever scoring it |
-| Q2 | BOARD OF DIRECTORS log (7 Gallup roles) | CSO | Live | Ensures dedicated relationship-building time is tracked as counts, not a vague "partner health" gut score |
+| Q1 | Heart checklist → persisted (`heart_log` table) | CSO/CMO | Next | Turns Qalb from decoration into data Hermes can carry forward (`ḥāfiẕa`), without ever scoring it. Check-ins sub-tab still static as of 2026-07-18 — this row is unchanged, just now living under Heart's "Check-ins" sub-tab instead of the bare tab body |
+| Q2 | BOARD OF DIRECTORS log (7 Gallup roles) | CSO | **Built 2026-07-18** | Ensures dedicated relationship-building time is tracked as counts, not a vague "partner health" gut score. New `board_touchpoints` table; live under Heart's "Board of Directors" sub-tab with a weekly touchpoint count + 0–7 role-coverage bar |
 | Q3 | CONTENT count (assets published) | CPO+CMO | Live | Simple counter, no new infra |
 | Q4 | AUDIENCE count (posts + engagement) | CMO, CSO | Ghost | Blocked on Sha picking a manual-entry cadence for Irori/LinkedIn numbers — stays ghost until she does |
 
@@ -41,8 +41,8 @@ Mind (Aqal — journal) and Body (Nafs — bookkeeping) are fully live with DB p
 
 | # | Product | CXO | Ghost→Live | Why now |
 |---|---|---|---|---|
-| R1 | Soul checklist → persisted (`soul_log` table) | Soul System | Live | Same fix as Q1, for Ruh — turns checkboxes into carry-forward data |
-| R2 | AQL Log + Quran Log views (read-only) | Soul System (secondary Aqal) | Live | Built 2026-07-18 — feeds R3 |
+| R1 | Soul checklist → persisted (`soul_log` table) | Soul System | Superseded | The static "Practice" checklist sub-tab was replaced 2026-07-18 by an "Intentions" sub-tab mirroring `Daily Intention` from the Quran Log sheet — Ruh's carry-forward data now comes from the sheet, not a persisted checklist. Re-open this row only if Sha wants the checklist itself back |
+| R2 | AQL Log + Quran Log views (read-only) | Soul System (secondary Aqal) | Live | Built 2026-07-18 — feeds R3. Quran Log view now shows page + reflection only; `Daily Intention` moved to its own Intentions sub-tab (R1) to avoid showing it twice |
 | R3 | REFLECTION DEPTH count (AQL/Quran entries + Soul checklist items this week) | Soul System | Live | Once R1+R2 exist, this is a count query — closes the Ruh gap without inventing a subjective score |
 | R4 | VALUES ALIGNMENT log (dated yes/no vs. Values Lock doc) | CLO | Ghost→Live | Waits on the Values Lock / legal docs existing to check against |
 
@@ -60,12 +60,12 @@ Mind (Aqal — journal) and Body (Nafs — bookkeeping) are fully live with DB p
 
 | Priority | Product | Faculty | Status | Depends on |
 |---|---|---|---|---|
-| 1 | N1 — Scorecard tab, RIZQ live (+ Dashboard summary) | Nafs | **Built 2026-07-18** | — |
+| 1 | N1 — Scorecard folded into faculty tabs, RIZQ live in Body | Nafs | **Built 2026-07-18**, re-platformed 2026-07-18 | — |
 | 2 | R2 — AQL Log + Quran Log views | Ruh/Aqal | **Built 2026-07-18** | — |
-| 3 | R1 — Soul checklist persisted | Ruh | Next | — |
-| 4 | Q1 — Heart checklist persisted | Qalb | Next | — |
-| 5 | R3 — REFLECTION DEPTH count | Ruh | Planned | R1, R2 |
-| 6 | Q2 — Board of Directors log | Qalb | Planned | — |
+| 3 | R1 — Soul Intentions log (GSheet-sourced, replaces Practice tab) | Ruh | **Built 2026-07-18** | — |
+| 4 | Q2 — Board of Directors log (7 Gallup roles) | Qalb | **Built 2026-07-18** | — |
+| 5 | Q1 — Heart checklist persisted | Qalb | Next | — |
+| 6 | R3 — REFLECTION DEPTH count | Ruh | Planned | R2 (R1 superseded — recompute against Intentions log instead) |
 | 7 | R4 — Values Alignment log | Ruh | Planned | Values Lock doc existing |
 | 8 | N2 — Profit + Cash live | Nafs | Planned | N1 |
 | 9 | N3, A1, A2 — Systems/Sprint/Stack counts | Nafs, Aqal | Planned | — |
