@@ -341,6 +341,106 @@ async function sendBrevoEmailInternal(payload, env) {
     return responseData;
 }
 
+/* ============================================================================
+   QUIZ CAPTURE — appends one student submission to the Kinder sheet (tab Quiz5)
+   Sheet: 1TE4i2t30NRkMHLRlZZyEk722SrqUl7elY8OfcCR0IcM
+   Env:   GOOGLE_SA_EMAIL, GOOGLE_SA_PRIVATE_KEY, QUIZ_SHEET_ID
+   The service account must be shared as Editor on the spreadsheet.
+   Route is fully additive — it touches no existing payment/newsletter path.
+   ========================================================================= */
+
+function pemToArrayBuffer(pem) {
+    const b64 = String(pem)
+        .replace(/-----BEGIN [^-]+-----/g, "")
+        .replace(/-----END [^-]+-----/g, "")
+        .replace(/\s+/g, "");
+    const raw = atob(b64);
+    const buf = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) buf[i] = raw.charCodeAt(i);
+    return buf.buffer;
+}
+
+function b64url(input) {
+    const bytes = typeof input === "string"
+        ? new TextEncoder().encode(input)
+        : new Uint8Array(input);
+    let str = "";
+    for (const b of bytes) str += String.fromCharCode(b);
+    return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+// Service-account JWT (RS256) -> short-lived Sheets access token. No user consent flow.
+async function getSheetsAccessToken(env) {
+    const now = Math.floor(Date.now() / 1000);
+    const header = b64url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
+    const claim = b64url(JSON.stringify({
+        iss: env.GOOGLE_SA_EMAIL,
+        scope: "https://www.googleapis.com/auth/spreadsheets",
+        aud: "https://oauth2.googleapis.com/token",
+        exp: now + 3600,
+        iat: now
+    }));
+    const signingInput = header + "." + claim;
+
+    const key = await crypto.subtle.importKey(
+        "pkcs8",
+        pemToArrayBuffer(String(env.GOOGLE_SA_PRIVATE_KEY).replace(/\\n/g, "\n")),
+        { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+        false,
+        ["sign"]
+    );
+    const sig = await crypto.subtle.sign(
+        "RSASSA-PKCS1-v1_5", key, new TextEncoder().encode(signingInput)
+    );
+    const jwt = signingInput + "." + b64url(sig);
+
+    const res = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+            grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+            assertion: jwt
+        })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error("Google token error: " + JSON.stringify(data));
+    return data.access_token;
+}
+
+// Column order must match the Quiz5 header exactly, A through Q.
+async function appendQuizRow(p, env, accessToken) {
+    const row = [
+        new Date().toISOString(),        // A Date   — SERVER time, never the browser's
+        p.name || "",                    // B Name
+        p.module || "",                  // C Module
+        p.subject || "",                 // D Subject
+        p.q?.[0] || "", p.a?.[0] || "",  // E,F
+        p.q?.[1] || "", p.a?.[1] || "",  // G,H
+        p.q?.[2] || "", p.a?.[2] || "",  // I,J
+        p.q?.[3] || "", p.a?.[3] || "",  // K,L
+        p.q?.[4] || "", p.a?.[4] || "",  // M,N
+        p.total_mark || "",              // O
+        p.easy_part || "",               // P
+        p.hard_part || ""                // Q
+    ];
+
+    const url = "https://sheets.googleapis.com/v4/spreadsheets/" +
+        encodeURIComponent(env.QUIZ_SHEET_ID) +
+        "/values/Quiz5!A1:Q1:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS";
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Authorization": "Bearer " + accessToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ values: [row] })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error("Sheets append error: " + JSON.stringify(data));
+    return data.updates?.updatedRange || "appended";
+}
+
 export default {
     async fetch(request, env, ctx) {
         // --- CONFIGURATION ---
@@ -483,6 +583,32 @@ export default {
                 }
 
                 return new Response(JSON.stringify({ message: "Subscribed" }), { status: 200, headers: corsHeaders });
+            }
+
+            // ACTION 4: SUBMIT QUIZ (append one row to the Kinder sheet, tab Quiz5)
+            // Called by the irori 5-question HTML. Additive — no payment path touched.
+            else if (action === 'submit_quiz') {
+                if (!env.GOOGLE_SA_EMAIL || !env.GOOGLE_SA_PRIVATE_KEY || !env.QUIZ_SHEET_ID) {
+                    return new Response(JSON.stringify({
+                        ok: false, error: "quiz_capture_not_configured"
+                    }), { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+                }
+
+                if (!payload.name || !Array.isArray(payload.a) || payload.a.length !== 5) {
+                    return new Response(JSON.stringify({
+                        ok: false, error: "invalid_submission"
+                    }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+                }
+
+                const accessToken = await getSheetsAccessToken(env);
+                const range = await appendQuizRow(payload, env, accessToken);
+                console.log(`Quiz row appended (${range}) for set ${payload.set_id || 'unknown'}`);
+
+                // Student sees no score — irori has no points, no bells. Only log them.
+                return new Response(JSON.stringify({ ok: true }), {
+                    status: 200,
+                    headers: { ...corsHeaders, "Content-Type": "application/json" }
+                });
             }
 
             return new Response("Invalid Action", { status: 400, headers: corsHeaders });
